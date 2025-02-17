@@ -1,0 +1,60 @@
+section {
+    background-color: #fff;
+    color: black;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: arial, sans-serif;
+}
+ 
+.navbar {
+    background-color: #a8d1e9;
+    width: 100%;
+    padding-block: 0.5rem;
+    align-items: center;
+    display: flex;
+    margin-inline: auto;
+    justify-content: right;
+    z-index: 9999;
+    gap: 1rem;
+    padding-right: 4rem ;
+}
+
+.table .userData {
+    margin-block: 5rem 1rem;
+    justify-items: center;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #3498db;
+    border: 1px solid #000;
+    color: white;
+    padding: 20px;
+    text-align: left;
+  }
+  
+  td {
+    border: 1px solid #000;
+    padding: 8px;
+    padding-inline: 20px;
+    text-align: left;
+  }
+  select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #706e6e;
+    background-color: #f5f2f2;
+    font-size: 16px;
+  }
+
+  .action button {
+    padding-inline: 5px;
+  }
+
+  .pagination ul {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
