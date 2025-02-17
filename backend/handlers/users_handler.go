@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,7 +11,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte("SECRET_KEY")
+var jwtSecret = []byte(getSecretKey())
+
+func getSecretKey() string {
+	secret := os.Getenv("SECRET_KEY")
+	if secret == "" {
+		secret = "gucc2025"
+	}
+	return secret
+}
 
 type AuthRequest struct {
 	Username string `json:"username"`
