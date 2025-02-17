@@ -14,6 +14,14 @@ type Report struct {
 }
 
 func MigrateReports(db *gorm.DB) {
-	db.Exec("CREATE TYPE status_enum AS ENUM ('pending', 'in progress', 'done');")
+	db.Exec(`
+		DO $$ 
+		BEGIN
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_enum') THEN
+				CREATE TYPE status_enum AS ENUM ('pending', 'in progress', 'done');
+			END IF;
+		END $$;
+	`)
+
 	db.AutoMigrate(&Report{})
 }
