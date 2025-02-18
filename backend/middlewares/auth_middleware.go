@@ -38,5 +38,17 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token"})
 	}
 
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token Claims"})
+	}
+
+	userID, ok := claims["user_id"].(float64)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Missing User ID"})
+	}
+
+	c.Locals("user_id", uint(userID))
+
 	return c.Next()
 }

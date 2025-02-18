@@ -26,4 +26,11 @@ func SetupRoutes(app *fiber.App) {
 	rooms.Post("/", handlers.CreateRoom)
 	rooms.Put("/:id", handlers.UpdateRoom)
 	rooms.Delete("/:id", handlers.DeleteRoom)
+
+	activityLogs := api.Group("/activity-logs", middlewares.AuthMiddleware)
+	activityLogs.Get("/", handlers.GetActivityLogs)
+	activityLogs.Get("/:id", handlers.GetActivityLogByID)
+	activityLogs.Post("/", handlers.CreateActivityLog)
+	activityLogs.Put("/:id", handlers.UpdateActivityLog)
+	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
 }
