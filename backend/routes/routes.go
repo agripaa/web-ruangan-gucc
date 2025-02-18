@@ -19,4 +19,11 @@ func SetupRoutes(app *fiber.App) {
 	reports.Post("/", handlers.CreateReport)
 	reports.Put("/:id", handlers.UpdateReport)
 	reports.Delete("/:id", handlers.DeleteReport)
+
+	rooms := api.Group("/rooms", middlewares.AuthMiddleware)
+	rooms.Get("/", handlers.GetRooms)
+	rooms.Get("/:id", handlers.GetRoomByID)
+	rooms.Post("/", handlers.CreateRoom)
+	rooms.Put("/:id", handlers.UpdateRoom)
+	rooms.Delete("/:id", handlers.DeleteRoom)
 }

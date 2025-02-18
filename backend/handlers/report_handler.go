@@ -29,6 +29,10 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
+	if report.Status == "" {
+		report.Status = "pending"
+	}
+
 	result := config.DB.Create(&report)
 	if result.Error != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create report"})
@@ -46,8 +50,25 @@ func UpdateReport(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
 	}
 
-	if err := c.BodyParser(&report); err != nil {
+	updateData := new(models.Report)
+	if err := c.BodyParser(updateData); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	if updateData.Username != "" {
+		report.Username = updateData.Username
+	}
+	if updateData.PhoneNumber != "" {
+		report.PhoneNumber = updateData.PhoneNumber
+	}
+	if updateData.RoomID != 0 {
+		report.RoomID = updateData.RoomID
+	}
+	if updateData.Status != "" {
+		report.Status = updateData.Status
+	}
+	if updateData.Constraint != "" {
+		report.Constraint = updateData.Constraint
 	}
 
 	config.DB.Save(&report)
