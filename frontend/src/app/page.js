@@ -1,101 +1,87 @@
 import Image from "next/image";
-
+import '@/style/homepage.css'
+import Logo from '@/assets/Universitas Gunadarma.png'
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="main-container">
+      <div className="title-logo">
+        <Image src={Logo} className="logo-UG" width={30} height={30} />
+        <p>UG Network Assistance</p>
+      </div>
+      
+      <section>
+        <div className="welcome">
+          <h1>Selamat Siang!</h1>
+          <p>Kami siap membantu kapan saja dan dimana saja!</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <main>
+          <form>
+            <div className="form-name">
+              <label for="name">Nama lengkap *</label>
+              <input type="text" placeholder="Full name"></input>
+            </div>
+
+            <div className="form-phone">
+              <label for="phone">Nomor telepon *</label>
+              <input type="text" placeholder="Phone number"></input>
+            </div>
+
+            <div className="form-location">
+              <label for="kampus">Kampus *</label>
+              <input list="location" id="kampus" name="kampus"></input>
+              <datalist id="location">
+                <option value="Kampus D Margonda"></option>
+                <option value="Kampus E Kelapa Dua"></option>
+                <option value="Kampus G Kelapa Dua"></option>
+                <option value="Kampus H Kelapa Dua"></option>
+                <option value="Kampus J1 Kalimalang"></option>
+              </datalist>
+            </div>
+
+            <div className="form-room">
+              <label for="room">Ruangan *</label>
+              <input type="text" placeholder="Job location"></input>
+            </div>
+
+            <div className="desc">
+              <label for="description">Deskripsi *</label>
+              <textarea placeholder="Type here"></textarea>
+            </div>
+
+          <div className="footer">
+            <div className="submit">
+              <button>Kirim Pengaduan</button>
+              <p>
+                Teknisi kami siap membantu! Kirim pengaduan sekarang,
+                dan kami akan segera menuju lokasi Anda.
+              </p>
+            </div>
+          </div>
+
+          </form>
+
+          <div className="track">
+            <div className="track-search">
+              <label for="tracking">Lacak Pengaduan</label>
+              <input type="text" placeholder="Masukkan nomor pengaduan"></input>
+              <button className="tracking-submit">Lacak</button>
+            </div>
+            
+            <div className="track-icon">
+              ICON
+            </div>
+
+            <div className="track-history">
+              <h2>Riwayat Pengaduan</h2>
+              <div className="history-list">
+                a, b , c
+              </div>
+            </div>
+          </div>
+        </main>
+      </section>
     </div>
+    
   );
 }

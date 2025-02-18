@@ -32,7 +32,7 @@ th {
     border: 1px solid #000;
     color: white;
     padding: 20px;
-    text-align: left;
+    text-align: center;
   }
   
   td {
@@ -49,8 +49,14 @@ th {
     font-size: 16px;
   }
 
+  .action {
+    justify-content: space-between;
+  }
+
   .action button {
-    padding-inline: 5px;
+    padding: 10px;
+    border: 1px solid;
+    margin-inline: 5px;
   }
 
   .pagination ul {

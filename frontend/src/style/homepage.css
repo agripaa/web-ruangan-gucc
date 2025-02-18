@@ -1,0 +1,67 @@
+.main-container {
+    display: flexbox;
+    height: 100vh;
+    margin: 0;
+    padding: 2rem 3rem;
+}
+
+.title-logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 3rem;
+    gap: 6px;
+}
+
+.title-logo p {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.welcome h1 {
+    font-weight: 500;
+    font-size: 35px;
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    color: #838383;
+    font-size: 12px;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    /* border: 1px solid black; */
+    margin-top: 40px;
+    align-items: start;
+    justify-content: space-between;
+}
+
+form {
+    width: 42%;
+}
+
+form .form-name {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    gap: 10px;
+}
+
+form input {
+    border: 1px solid #00000028;
+    border-radius: 25px;
+    padding: 15px 25px;
+    font-size: 12px;
+}
+
+form label {
+    color: #33363F;
+    font-weight: 300;
+}
+
+.track {
+    /* border: 1px solid #000; */
+    width: 42%;
+}
