@@ -38,7 +38,7 @@ func setupTestAppReport() *fiber.App {
 func TestCreateReport(t *testing.T) {
 	app := setupTestAppReport()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "201", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "201"}
 	config.DB.Create(&room)
 
 	var latestRoom models.Room
@@ -71,7 +71,7 @@ func TestGetReports(t *testing.T) {
 func TestGetReportByID(t *testing.T) {
 	app := setupTestAppReport()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "202", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "202"}
 	config.DB.Create(&room)
 
 	var latestRoom models.Room
@@ -97,7 +97,7 @@ func TestGetReportByID(t *testing.T) {
 func TestUpdateReport(t *testing.T) {
 	app := setupTestAppReport()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "203", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "203"}
 	config.DB.Create(&room)
 
 	var latestRoom models.Room
@@ -125,7 +125,7 @@ func TestUpdateReport(t *testing.T) {
 func TestDeleteReport(t *testing.T) {
 	app := setupTestAppReport()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "204", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "204"}
 	config.DB.Create(&room)
 
 	var latestRoom models.Room

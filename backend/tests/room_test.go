@@ -69,7 +69,7 @@ func TestGetRoomByID(t *testing.T) {
 	app := setupTestAppRoom()
 
 	// Buat room agar ada yang bisa diambil
-	room := models.Room{NameRoom: "Meeting Room", NumberRoom: "102", IsReady: true}
+	room := models.Room{NameRoom: "Meeting Room", NumberRoom: "102"}
 	config.DB.Create(&room)
 
 	// Cari ID room terbaru
@@ -90,7 +90,7 @@ func TestUpdateRoom(t *testing.T) {
 	app := setupTestAppRoom()
 
 	// Buat room untuk diupdate
-	room := models.Room{NameRoom: "Training Room", NumberRoom: "103", IsReady: true}
+	room := models.Room{NameRoom: "Training Room", NumberRoom: "103"}
 	config.DB.Create(&room)
 
 	// Cari ID terbaru
@@ -113,7 +113,7 @@ func TestDeleteRoom(t *testing.T) {
 	app := setupTestAppRoom()
 
 	// Buat room untuk dihapus
-	room := models.Room{NameRoom: "To Be Deleted", NumberRoom: "104", IsReady: true}
+	room := models.Room{NameRoom: "To Be Deleted", NumberRoom: "104"}
 	config.DB.Create(&room)
 
 	// Cari ID terbaru

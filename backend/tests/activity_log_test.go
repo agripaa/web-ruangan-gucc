@@ -38,7 +38,7 @@ func setupTestAppActivityLog() *fiber.App {
 func TestCreateActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "001", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "001"}
 	config.DB.Create(&room)
 
 	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "AC rusak"}
@@ -76,7 +76,7 @@ func TestGetActivityLogs(t *testing.T) {
 func TestGetActivityLogByID(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "002", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "002"}
 	config.DB.Create(&room)
 
 	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "Lampu mati"}
@@ -109,7 +109,7 @@ func TestGetActivityLogByID(t *testing.T) {
 func TestUpdateActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "003", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "003"}
 	config.DB.Create(&room)
 
 	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "Lampu redup"}
@@ -144,7 +144,7 @@ func TestUpdateActivityLog(t *testing.T) {
 func TestDeleteActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "004", IsReady: true}
+	room := models.Room{NameRoom: "Test Room", NumberRoom: "004"}
 	config.DB.Create(&room)
 
 	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "AC bocor"}
