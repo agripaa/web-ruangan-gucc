@@ -3,21 +3,65 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func GetReports(c *fiber.Ctx) error {
 	var reports []models.Report
-	config.DB.Preload("Room").Find(&reports)
+	currentDate := time.Now().Format("2006-01-02")
+
+	config.DB.Preload("Campus").Where(
+		"status IN (?) AND DATE(updated_at) >= ?",
+		[]string{"on the way", "in progress", "done"}, currentDate,
+	).Order("updated_at DESC").Limit(15).Find(&reports)
+
 	return c.JSON(reports)
+}
+
+func SearchReportByToken(c *fiber.Ctx) error {
+	token := c.Query("token")
+	if token == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "Token parameter is required"})
+	}
+
+	var reports []models.Report
+	config.DB.Preload("Campus").Where("token LIKE ?", "%"+token+"%").Find(&reports)
+
+	if len(reports) == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "No reports found"})
+	}
+
+	return c.JSON(reports)
+}
+
+func GetReportPagination(c *fiber.Ctx) error {
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	offset := (page - 1) * limit
+
+	var reports []models.Report
+	var total int64
+
+	query := config.DB.Preload("Campus")
+	query.Model(&models.Report{}).Count(&total)
+	query.Offset(offset).Limit(limit).Find(&reports)
+
+	return c.JSON(fiber.Map{
+		"data":        reports,
+		"total":       total,
+		"page":        page,
+		"limit":       limit,
+		"total_pages": (total + int64(limit) - 1) / int64(limit),
+	})
 }
 
 func GetReportByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var report models.Report
-	result := config.DB.Preload("Room").First(&report, id)
-	if result.Error != nil {
+	if err := config.DB.Preload("Campus").First(&report, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
 	}
 	return c.JSON(report)
@@ -29,12 +73,8 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	if report.Status == "" {
-		report.Status = "pending"
-	}
-
-	result := config.DB.Create(&report)
-	if result.Error != nil {
+	report.Status = "pending"
+	if err := config.DB.Create(&report).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create report"})
 	}
 
@@ -45,8 +85,7 @@ func UpdateReport(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var report models.Report
 
-	result := config.DB.First(&report, id)
-	if result.Error != nil {
+	if err := config.DB.First(&report, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
 	}
 
@@ -55,33 +94,14 @@ func UpdateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	if updateData.Username != "" {
-		report.Username = updateData.Username
-	}
-	if updateData.PhoneNumber != "" {
-		report.PhoneNumber = updateData.PhoneNumber
-	}
-	if updateData.CampusID != 0 {
-		report.CampusID = updateData.CampusID
-	}
-	if updateData.Status != "" {
-		report.Status = updateData.Status
-	}
-	if updateData.Description != "" {
-		report.Description = updateData.Description
-	}
-
-	config.DB.Save(&report)
+	config.DB.Model(&report).Updates(updateData)
 	return c.JSON(report)
 }
 
 func DeleteReport(c *fiber.Ctx) error {
 	id := c.Params("id")
-	result := config.DB.Delete(&models.Report{}, id)
-
-	if result.RowsAffected == 0 {
+	if result := config.DB.Delete(&models.Report{}, id); result.RowsAffected == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
 	}
-
 	return c.JSON(fiber.Map{"message": "Report deleted successfully"})
 }

@@ -13,21 +13,29 @@ func SetupRoutes(app *fiber.App) {
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
 
-	reports := api.Group("/reports", middlewares.AuthMiddleware)
+	// Public access reports
+	reports := api.Group("/reports")
 	reports.Get("/", handlers.GetReports)
-	reports.Get("/:id", handlers.GetReportByID)
+	reports.Get("/search", handlers.SearchReportByToken)
 	reports.Post("/", handlers.CreateReport)
-	reports.Put("/:id", handlers.UpdateReport)
-	reports.Delete("/:id", handlers.DeleteReport)
 
-	rooms := api.Group("/rooms", middlewares.AuthMiddleware)
+	// Admin access requires authentication
+	admin := api.Group("/admin", middlewares.AuthMiddleware)
+
+	adminReports := admin.Group("/reports")
+	adminReports.Get("/:id", handlers.GetReportByID)
+	adminReports.Get("/paginate", handlers.GetReportPagination)
+	adminReports.Put("/:id", handlers.UpdateReport)
+	adminReports.Delete("/:id", handlers.DeleteReport)
+
+	rooms := admin.Group("/rooms")
 	rooms.Get("/", handlers.GetRooms)
 	rooms.Get("/:id", handlers.GetRoomByID)
 	rooms.Post("/", handlers.CreateRoom)
 	rooms.Put("/:id", handlers.UpdateRoom)
 	rooms.Delete("/:id", handlers.DeleteRoom)
 
-	activityLogs := api.Group("/activity-logs", middlewares.AuthMiddleware)
+	activityLogs := admin.Group("/activity-logs")
 	activityLogs.Get("/", handlers.GetActivityLogs)
 	activityLogs.Get("/:id", handlers.GetActivityLogByID)
 	activityLogs.Post("/", handlers.CreateActivityLog)
