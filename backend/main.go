@@ -19,6 +19,8 @@ func main() {
 	models.MigrateReports(config.DB)
 	models.MigrateRooms(config.DB)
 	models.MigrateActivityLogs(config.DB)
+	models.MigrateCampus(config.DB)
+	models.MigrateRoles(config.DB)
 
 	routes.SetupRoutes(app)
 

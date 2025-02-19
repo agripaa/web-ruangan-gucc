@@ -61,14 +61,14 @@ func UpdateReport(c *fiber.Ctx) error {
 	if updateData.PhoneNumber != "" {
 		report.PhoneNumber = updateData.PhoneNumber
 	}
-	if updateData.RoomID != 0 {
-		report.RoomID = updateData.RoomID
+	if updateData.CampusID != 0 {
+		report.CampusID = updateData.CampusID
 	}
 	if updateData.Status != "" {
 		report.Status = updateData.Status
 	}
-	if updateData.Constraint != "" {
-		report.Constraint = updateData.Constraint
+	if updateData.Description != "" {
+		report.Description = updateData.Description
 	}
 
 	config.DB.Save(&report)

@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Campus struct {
 	ID             uint   `gorm:"primaryKey"`
-	CampusName     string `gorm:"type:varchar(50);not null"`
-	CampusLocation string `gorm:"type:varchar(25);not null"`
+	CampusName     string `gorm:"type:varchar(255);not null"`
+	CampusLocation string `gorm:"type:varchar(255);not null"`
 }
 
 func MigrateCampus(db *gorm.DB) {

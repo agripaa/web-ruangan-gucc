@@ -74,11 +74,11 @@ func TestGetReportByID(t *testing.T) {
 	room := models.Room{NameRoom: "Test Room", NumberRoom: "202"}
 	config.DB.Create(&room)
 
-	var latestRoom models.Room
-	config.DB.Order("id desc").First(&latestRoom)
-	roomID := latestRoom.ID
+	var latestCampus models.Campus
+	config.DB.Order("id desc").First(&latestCampus)
+	campusId := latestCampus.ID
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: roomID, Constraint: "Lampu mati"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campusId, Description: "Lampu mati"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report
@@ -100,11 +100,11 @@ func TestUpdateReport(t *testing.T) {
 	room := models.Room{NameRoom: "Test Room", NumberRoom: "203"}
 	config.DB.Create(&room)
 
-	var latestRoom models.Room
-	config.DB.Order("id desc").First(&latestRoom)
-	roomID := latestRoom.ID
+	var latestCampus models.Campus
+	config.DB.Order("id desc").First(&latestCampus)
+	campusId := latestCampus.ID
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: roomID, Constraint: "Lampu redup"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campusId, Description: "Lampu redup"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report
@@ -128,11 +128,11 @@ func TestDeleteReport(t *testing.T) {
 	room := models.Room{NameRoom: "Test Room", NumberRoom: "204"}
 	config.DB.Create(&room)
 
-	var latestRoom models.Room
-	config.DB.Order("id desc").First(&latestRoom)
-	roomID := latestRoom.ID
+	var latestCampus models.Campus
+	config.DB.Order("id desc").First(&latestCampus)
+	campusId := latestCampus.ID
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: roomID, Constraint: "AC bocor"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campusId, Description: "AC bocor"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report

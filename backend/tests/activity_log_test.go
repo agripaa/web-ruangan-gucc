@@ -38,10 +38,10 @@ func setupTestAppActivityLog() *fiber.App {
 func TestCreateActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "001"}
-	config.DB.Create(&room)
+	campus := models.Campus{CampusName: "Kampus D", CampusLocation: "Margonda, Depok"}
+	config.DB.Create(&campus)
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "AC rusak"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campus.ID, Room: "D424", Description: "AC rusak"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report
@@ -76,10 +76,10 @@ func TestGetActivityLogs(t *testing.T) {
 func TestGetActivityLogByID(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "002"}
-	config.DB.Create(&room)
+	campus := models.Campus{CampusName: "Kampus D", CampusLocation: "Margonda, Depok"}
+	config.DB.Create(&campus)
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "Lampu mati"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campus.ID, Room: "D424", Description: "AC rusak"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report
@@ -109,10 +109,10 @@ func TestGetActivityLogByID(t *testing.T) {
 func TestUpdateActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "003"}
-	config.DB.Create(&room)
+	campus := models.Campus{CampusName: "Kampus D", CampusLocation: "Margonda, Depok"}
+	config.DB.Create(&campus)
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "Lampu redup"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campus.ID, Room: "D424", Description: "AC rusak"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report
@@ -144,10 +144,10 @@ func TestUpdateActivityLog(t *testing.T) {
 func TestDeleteActivityLog(t *testing.T) {
 	app := setupTestAppActivityLog()
 
-	room := models.Room{NameRoom: "Test Room", NumberRoom: "004"}
-	config.DB.Create(&room)
+	campus := models.Campus{CampusName: "Kampus D", CampusLocation: "Margonda, Depok"}
+	config.DB.Create(&campus)
 
-	report := models.Report{Username: "testuser", PhoneNumber: "123456789", RoomID: room.ID, Constraint: "AC bocor"}
+	report := models.Report{Username: "testuser", PhoneNumber: "123456789", CampusID: campus.ID, Room: "D424", Description: "AC rusak"}
 	config.DB.Create(&report)
 
 	var latestReport models.Report

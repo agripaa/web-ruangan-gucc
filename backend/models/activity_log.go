@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 type ActivityLog struct {
 	ID             uint   `gorm:"primaryKey"`
-	Action         string `gorm:"type:varchar(50);not null" json:"action"`
-	DetailAction   string `gorm:"type:varchar(125);not null" json:"detail_action"`
-	TargetReportID uint   `gorm:"not null" json:"target_report_id"`
-	UserID         *uint  `gorm:"foreignKey:UserID" json:"user_id"`
+	Action         string `gorm:"type:varchar(50);not null"`
+	DetailAction   string `gorm:"type:varchar(125);not null"`
+	TargetReportID uint   `gorm:"not null"`
+	UserID         *uint  `gorm:"foreignKey:UserID"`
 	Timestamp      string `gorm:"default:CURRENT_TIMESTAMP"`
 
 	User   User   `gorm:"foreignKey:UserID"`
