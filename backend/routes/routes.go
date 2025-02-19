@@ -41,4 +41,12 @@ func SetupRoutes(app *fiber.App) {
 	activityLogs.Post("/", handlers.CreateActivityLog)
 	activityLogs.Put("/:id", handlers.UpdateActivityLog)
 	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
+
+	campus := api.Group("/campus", middlewares.AuthMiddleware)
+	campus.Get("/", handlers.GetCampuses)
+	campus.Get("/:id", handlers.GetCampusByID)
+	campus.Post("/", handlers.CreateCampus)
+	campus.Put("/:id", handlers.UpdateCampus)
+	campus.Patch("/:id", handlers.UpdateCampus)
+	campus.Delete("/:id", handlers.DeleteCampus)
 }
