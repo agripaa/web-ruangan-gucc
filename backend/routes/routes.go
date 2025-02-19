@@ -24,16 +24,9 @@ func SetupRoutes(app *fiber.App) {
 
 	adminReports := admin.Group("/reports")
 	adminReports.Get("/:id", handlers.GetReportByID)
-	adminReports.Get("/paginate", handlers.GetReportPagination)
+	adminReports.Get("/paginate/datum", handlers.GetReportPagination)
 	adminReports.Put("/:id", handlers.UpdateReport)
 	adminReports.Delete("/:id", handlers.DeleteReport)
-
-	rooms := admin.Group("/rooms")
-	rooms.Get("/", handlers.GetRooms)
-	rooms.Get("/:id", handlers.GetRoomByID)
-	rooms.Post("/", handlers.CreateRoom)
-	rooms.Put("/:id", handlers.UpdateRoom)
-	rooms.Delete("/:id", handlers.DeleteRoom)
 
 	activityLogs := admin.Group("/activity-logs")
 	activityLogs.Get("/", handlers.GetActivityLogs)
@@ -42,7 +35,7 @@ func SetupRoutes(app *fiber.App) {
 	activityLogs.Put("/:id", handlers.UpdateActivityLog)
 	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
 
-	campus := api.Group("/campus", middlewares.AuthMiddleware)
+	campus := admin.Group("/campus")
 	campus.Get("/", handlers.GetCampuses)
 	campus.Get("/:id", handlers.GetCampusByID)
 	campus.Post("/", handlers.CreateCampus)

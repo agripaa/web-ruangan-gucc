@@ -3,11 +3,33 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"math/rand"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func generateUniqueToken(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	var token string
+	for {
+		tokenBytes := make([]byte, length)
+		for i := range tokenBytes {
+			tokenBytes[i] = charset[rand.Intn(len(charset))]
+		}
+		token = string(tokenBytes)
+
+		var count int64
+		config.DB.Model(&models.Report{}).Where("token = ?", token).Count(&count)
+		if count == 0 {
+			break // Token is unique, exit loop
+		}
+	}
+	return token
+}
 
 func GetReports(c *fiber.Ctx) error {
 	var reports []models.Report
@@ -15,7 +37,7 @@ func GetReports(c *fiber.Ctx) error {
 
 	config.DB.Preload("Campus").Where(
 		"status IN (?) AND DATE(updated_at) >= ?",
-		[]string{"on the way", "in progress", "done"}, currentDate,
+		[]string{"pending", "on the way", "in progress", "done"}, currentDate,
 	).Order("updated_at DESC").Limit(15).Find(&reports)
 
 	return c.JSON(reports)
@@ -73,7 +95,11 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
+	report.Token = generateUniqueToken(20)
 	report.Status = "pending"
+	report.ReportedAt = time.Now()
+	report.UpdatedAt = time.Now()
+
 	if err := config.DB.Create(&report).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create report"})
 	}
@@ -93,6 +119,8 @@ func UpdateReport(c *fiber.Ctx) error {
 	if err := c.BodyParser(updateData); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	updateData.UpdatedAt = time.Now()
 
 	config.DB.Model(&report).Updates(updateData)
 	return c.JSON(report)

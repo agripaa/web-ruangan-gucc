@@ -17,7 +17,6 @@ func main() {
 
 	models.MigrateUsers(config.DB)
 	models.MigrateReports(config.DB)
-	models.MigrateRooms(config.DB)
 	models.MigrateActivityLogs(config.DB)
 	models.MigrateCampus(config.DB)
 	models.MigrateRoles(config.DB)

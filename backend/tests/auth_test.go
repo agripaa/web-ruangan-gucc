@@ -120,3 +120,40 @@ func extractTokenFromResponse(resp *http.Response) string {
 	}
 	return token
 }
+
+func getAuthToken(t *testing.T, app *fiber.App) string {
+	// Hapus user sebelumnya
+	config.DB.Where("username = ?", "testuser").Delete(&models.User{})
+
+	// Hash password "password123" dengan bcrypt
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+	user := models.User{Username: "testuser", Password: string(hashedPassword)}
+	config.DB.Create(&user)
+
+	// Request login
+	loginRequest := `{"username":"testuser","password":"password123"}`
+	req := httptest.NewRequest("POST", "/api/login", strings.NewReader(loginRequest))
+	req.Header.Set("Content-Type", "application/json")
+	resp, _ := app.Test(req, -1)
+
+	// Baca response body
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	// Debug: Tampilkan response body jika login gagal
+	t.Logf("Login Response: %s", string(bodyBytes))
+
+	// Parse JSON response
+	var responseMap map[string]interface{}
+	err := json.Unmarshal(bodyBytes, &responseMap)
+	assert.Nil(t, err)
+
+	token, exists := responseMap["token"].(string)
+	assert.True(t, exists, "Token should exist in response")
+	assert.NotEmpty(t, token, "Token should not be empty")
+
+	// Debug: Pastikan token tidak kosong
+	t.Logf("Received Token: %s", token)
+
+	return token
+}
