@@ -6,7 +6,7 @@ const Modal = ({ isOpen, title, children, onClose, onSubmit, submitText }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-4/12">
         <h2 className="text-xl font-semibold mb-4">{title}</h2>
         {children}
         <div className="flex justify-end space-x-3 mt-4">
