@@ -12,10 +12,11 @@ const Campus = () => {
     { id: 3, CampusName: "Kampus A", CampusLocation: "Kelapa Dua, Depok" },
     { id: 4, CampusName: "Kampus B", CampusLocation: "Kelapa Dua, Depok" },
     { id: 5, CampusName: "Kampus F", CampusLocation: "Margonda, Depok" },
+    { id: 6, CampusName: "Kampus H", CampusLocation: "Kelapa Dua, Depok" },
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [modalType, setModalType] = useState(null); // 'create' or 'edit'
+  const [modalType, setModalType] = useState(null);
   const [selectedCampus, setSelectedCampus] = useState(null);
   const [form, setForm] = useState({ CampusName: "", CampusLocation: "" });
 
@@ -25,12 +26,10 @@ const Campus = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentReports = reports.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Handle form input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Open Create or Edit Modal
   const openModal = (type, campus = null) => {
     setModalType(type);
     if (type === "edit" && campus) {
@@ -41,13 +40,11 @@ const Campus = () => {
     }
   };
 
-  // Close Modal
   const closeModal = () => {
     setModalType(null);
     setSelectedCampus(null);
   };
 
-  // Handle Submit
   const handleSubmit = () => {
     if (modalType === "create") {
       setReports([...reports, { id: reports.length + 1, ...form }]);
@@ -120,7 +117,7 @@ const Campus = () => {
                   </button>
                   <button
                     onClick={() => handleDelete(report.id)}
-                    className="text-red-500 hover:text-red-700"
+                    className="bg-red-500 p-2 hover:bg-red-700 text-white rounded-md"
                   >
                     <FaTrash />
                   </button>
@@ -129,6 +126,37 @@ const Campus = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col items-center mt-4">
+        <div className="flex justify-center items-center">
+            <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            disabled={currentPage === 1}
+            >
+            {"<"}
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+            <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"}`}
+            >
+                {i + 1}
+            </button>
+            ))}
+
+            <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            disabled={currentPage === totalPages}
+            >
+            {">"}
+            </button>
+        </div>
       </div>
 
       {/* Modal */}
