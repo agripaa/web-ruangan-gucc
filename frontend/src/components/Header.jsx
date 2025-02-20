@@ -14,7 +14,7 @@ const Header = () => {
           </div>
           <div className='flex items-center'>
             <FaBell className="text-gray-600 text-2xl cursor-pointer mr-6" />
-            <button className='text-white bg-red-600 py-2 px-4 font-semibold rounded-xl'>Logout</button>
+            <button className='text-white bg-red-600 cursor-pointer hover:bg-red-800 py-2 px-4 font-semibold rounded-xl'>Logout</button>
           </div>
         </div>
 
