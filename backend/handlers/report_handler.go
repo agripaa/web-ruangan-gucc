@@ -3,11 +3,14 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jung-kurt/gofpdf"
+	"github.com/xuri/excelize/v2"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -29,6 +32,72 @@ func generateUniqueToken(length int) string {
 		}
 	}
 	return token
+}
+
+func ExportReportsToPDF(c *fiber.Ctx) error {
+	var reports []models.Report
+	config.DB.Preload("Campus").Find(&reports)
+
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 12)
+	pdf.Cell(40, 10, "Report Data")
+	pdf.Ln(10)
+
+	pdf.SetFont("Arial", "", 10)
+	for _, report := range reports {
+		pdf.Cell(40, 10, fmt.Sprintf("Username: %s", report.Username))
+		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Phone Number: %s", report.PhoneNumber))
+		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Room: %s", report.Room))
+		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Campus: %s, %s", report.Campus.CampusName, report.Campus.CampusLocation))
+		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Status: %s", report.Status))
+		pdf.Ln(10)
+	}
+
+	pdfPath := "reports.pdf"
+	err := pdf.OutputFileAndClose(pdfPath)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to generate PDF"})
+	}
+
+	return c.Download(pdfPath)
+}
+
+func ExportReportsToExcel(c *fiber.Ctx) error {
+	var reports []models.Report
+	config.DB.Preload("Campus").Find(&reports)
+
+	xlsx := excelize.NewFile()
+	sheet := "Reports"
+	xlsx.SetSheetName("Sheet1", sheet)
+
+	headers := []string{"Username", "Phone Number", "Room", "Campus Name", "Campus Location", "Status", "Description"}
+	for col, header := range headers {
+		colLetter, _ := excelize.ColumnNumberToName(col + 1)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("%s1", colLetter), header)
+	}
+
+	for rowIdx, report := range reports {
+		row := rowIdx + 2
+		xlsx.SetCellValue(sheet, fmt.Sprintf("A%d", row), report.Username)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("B%d", row), report.PhoneNumber)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("C%d", row), report.Room)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("D%d", row), report.Campus.CampusName)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("E%d", row), report.Campus.CampusLocation)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("F%d", row), report.Status)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("G%d", row), report.Description)
+	}
+
+	excelPath := "reports.xlsx"
+	if err := xlsx.SaveAs(excelPath); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to generate Excel file"})
+	}
+
+	return c.Download(excelPath)
 }
 
 func GetReports(c *fiber.Ctx) error {

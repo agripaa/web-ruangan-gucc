@@ -30,6 +30,8 @@ func SetupRoutes(app *fiber.App) {
 	adminReports.Get("/paginate/datum", handlers.GetReportPagination)
 	adminReports.Put("/:id", handlers.UpdateReport)
 	adminReports.Delete("/:id", handlers.DeleteReport)
+	adminReports.Get("/export/pdf", handlers.ExportReportsToPDF)
+	adminReports.Get("/export/excel", handlers.ExportReportsToExcel)
 
 	activityLogs := admin.Group("/activity-logs")
 	activityLogs.Get("/", handlers.GetActivityLogs)
