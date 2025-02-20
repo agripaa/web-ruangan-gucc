@@ -26,7 +26,7 @@ const Sidebar = () => {
               <li key={item.href}>
                 <Link href={item.href}>
                   <div
-                    className={`flex items-center justify-center gap-5 py-3 rounded-xl cursor-pointer text-3xl 
+                    className={`flex items-center justify-center gap-5 py-3 rounded-xl cursor-pointer text-2xl 
                       ${pathname === item.href ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-[#9F9F9F]"}`}
                   >
                     {item.icon}
