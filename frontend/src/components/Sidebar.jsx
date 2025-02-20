@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import LogoGUCC from '@/assets/Logo GUCC.png';
 import { FaHome, FaClock, FaFolder, FaUser } from "react-icons/fa";
+import { FaBuildingUser } from "react-icons/fa6"; 
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ const Sidebar = () => {
     { name: "Home", href: "/admin", icon: <FaHome /> },
     { name: "Incoming Reports", href: "/admin/laporan-masuk", icon: <FaClock /> },
     { name: "Reports", href: "/admin/laporan", icon: <FaFolder /> },
+    { name: "Campus", href: "/admin/campus", icon: <FaBuildingUser /> },
     { name: "Profile", href: "/admin/profile", icon: <FaUser /> }
   ];
 
