@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { FaFileAlt, FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
+import { FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 
 const AdminPage = () => {
