@@ -22,6 +22,9 @@ func SetupRoutes(app *fiber.App) {
 	// Admin access requires authentication
 	admin := api.Group("/admin", middlewares.AuthMiddleware)
 
+	user := admin.Group("/user")
+	user.Get("/profile", handlers.GetProfile)
+
 	adminReports := admin.Group("/reports")
 	adminReports.Get("/:id", handlers.GetReportByID)
 	adminReports.Get("/paginate/datum", handlers.GetReportPagination)

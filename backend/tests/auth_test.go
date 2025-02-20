@@ -36,6 +36,24 @@ func setupTestApp() *fiber.App {
 	return app
 }
 
+func TestGetProfile(t *testing.T) {
+	app := setupTestAppReport()
+	token := getAuthToken(t, app) // Pastikan fungsi ini sudah tersedia
+
+	req := httptest.NewRequest("GET", "/api/user/profile", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, _ := app.Test(req, -1)
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var response map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&response)
+
+	assert.NotNil(t, response["username"])
+	assert.NotNil(t, response["phone_number"])
+	assert.NotNil(t, response["role"])
+}
+
 func TestRegister(t *testing.T) {
 	app := setupTestApp()
 

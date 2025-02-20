@@ -26,8 +26,13 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
+type RegisterRequest struct {
+	AuthRequest
+	PhoneNumber string `json:"phone_number"`
+}
+
 func Register(c *fiber.Ctx) error {
-	var request AuthRequest
+	var request RegisterRequest
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
@@ -38,8 +43,10 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	user := models.User{
-		Username: request.Username,
-		Password: string(hashedPassword),
+		Username:    request.Username,
+		Password:    string(hashedPassword),
+		PhoneNumber: request.PhoneNumber,
+		Role:        "user",
 	}
 
 	result := config.DB.Create(&user)
@@ -79,4 +86,22 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"token": tokenString})
+}
+
+func GetProfile(c *fiber.Ctx) error {
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	userID := claims["user_id"]
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	return c.JSON(fiber.Map{
+		"id":           user.ID,
+		"username":     user.Username,
+		"phone_number": user.PhoneNumber,
+		"role":         user.Role,
+	})
 }
