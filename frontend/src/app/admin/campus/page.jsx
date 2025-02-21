@@ -1,30 +1,33 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getCampuses, createCampus, updateCampus, deleteCampus } from "@/services/campus";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { FaBuildingUser } from "react-icons/fa6"; 
+import { FaBuildingUser } from "react-icons/fa6";
 import Swal from "sweetalert2";
-import Modal from "@/components/Modal"; 
+import Modal from "@/components/Modal";
 
 const Campus = () => {
-  const [reports, setReports] = useState([
-    { id: 1, CampusName: "Kampus D", CampusLocation: "Margonda, Depok" },
-    { id: 2, CampusName: "Kampus G", CampusLocation: "Kelapa Dua, Depok" },
-    { id: 3, CampusName: "Kampus A", CampusLocation: "Kelapa Dua, Depok" },
-    { id: 4, CampusName: "Kampus B", CampusLocation: "Kelapa Dua, Depok" },
-    { id: 5, CampusName: "Kampus F", CampusLocation: "Margonda, Depok" },
-    { id: 6, CampusName: "Kampus H", CampusLocation: "Kelapa Dua, Depok" },
-  ]);
-
+  const [campuses, setCampuses] = useState([]); 
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [modalType, setModalType] = useState(null);
   const [selectedCampus, setSelectedCampus] = useState(null);
   const [form, setForm] = useState({ CampusName: "", CampusLocation: "" });
 
-  const itemsPerPage = 4;
-  const totalPages = Math.ceil(reports.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentReports = reports.slice(indexOfFirstItem, indexOfLastItem);
+  useEffect(() => {
+    fetchCampuses();
+  }, [currentPage]);
+
+  const fetchCampuses = async () => {
+    try {
+      const data = await getCampuses(currentPage, 10);
+      setCampuses(data?.data || []); 
+      setTotalPages(data?.total_pages || 1);
+    } catch (error) {
+      console.error("Failed to fetch campuses:", error);
+      setCampuses([]); 
+    }
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,20 +48,21 @@ const Campus = () => {
     setSelectedCampus(null);
   };
 
-  const handleSubmit = () => {
-    if (modalType === "create") {
-      setReports([...reports, { id: reports.length + 1, ...form }]);
-    } else if (modalType === "edit") {
-      setReports(
-        reports.map((campus) =>
-          campus.id === selectedCampus.id ? { ...campus, ...form } : campus
-        )
-      );
+  const handleSubmit = async () => {
+    try {
+      if (modalType === "create") {
+        await createCampus(form);
+      } else if (modalType === "edit") {
+        await updateCampus(selectedCampus.ID, form);
+      }
+      fetchCampuses();
+      closeModal();
+    } catch (error) {
+      console.error("Failed to submit:", error);
     }
-    closeModal();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
@@ -67,9 +71,10 @@ const Campus = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setReports(reports.filter((campus) => campus.id !== id));
+        await deleteCampus(id);
+        fetchCampuses();
         Swal.fire("Deleted!", "The campus has been deleted.", "success");
       }
     });
@@ -104,26 +109,34 @@ const Campus = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-            {currentReports.map((report) => (
-              <tr key={report.id} className="border-b">
-                <td className="p-3">{report.CampusName}</td>
-                <td className="p-3">{report.CampusLocation}</td>
-                <td className="p-3 flex justify-center space-x-3">
-                  <button
-                    onClick={() => openModal("edit", report)}
-                    className="bg-yellow-500 p-2 hover:bg-yellow-700 text-white rounded-md"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(report.id)}
-                    className="bg-red-500 p-2 hover:bg-red-700 text-white rounded-md"
-                  >
-                    <FaTrash />
-                  </button>
+            {campuses?.length > 0 ? (
+              campuses.map((campus) => (
+                <tr key={campus.ID} className="border-b">
+                  <td className="p-3">{campus.CampusName}</td>
+                  <td className="p-3">{campus.CampusLocation}</td>
+                  <td className="p-3 flex justify-center space-x-3">
+                    <button
+                      onClick={() => openModal("edit", campus)}
+                      className="bg-yellow-500 p-2 hover:bg-yellow-700 text-white rounded-md"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(campus.ID)}
+                      className="bg-red-500 p-2 hover:bg-red-700 text-white rounded-md"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="p-3 text-center text-gray-500">
+                  No campuses found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -131,33 +144,47 @@ const Campus = () => {
       {/* Pagination */}
       <div className="flex flex-col items-center mt-4">
         <div className="flex justify-center items-center">
-            <button
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
             disabled={currentPage === 1}
-            >
+          >
             {"<"}
-            </button>
+          </button>
 
-            {[...Array(totalPages)].map((_, i) => (
-            <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"}`}
-            >
-                {i + 1}
-            </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((page) => {
+              if (totalPages <= 3) return true; // Jika total halaman ≤ 3, tampilkan semua
+              if (currentPage === 1) return page <= 3; // Jika di halaman pertama, tampilkan 1, 2, 3
+              if (currentPage === totalPages) return page >= totalPages - 2; // Jika di halaman terakhir, tampilkan totalPages-2, totalPages-1, totalPages
+              return page >= currentPage - 1 && page <= currentPage + 1; // Tampilkan currentPage - 1, currentPage, currentPage + 1
+            })
+            .map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+                  currentPage === page ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"
+                }`}
+              >
+                {page}
+              </button>
             ))}
 
-            <button
+          <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
             disabled={currentPage === totalPages}
-            >
+          >
             {">"}
-            </button>
+          </button>
         </div>
       </div>
+
 
       {/* Modal */}
       <Modal

@@ -111,34 +111,47 @@ const Laporan = () => {
           </tbody>
         </table>
       </div>
-      {/* Wrapper agar pagination tetap di bawah tabel */}
+      {/* Pagination */}
       <div className="flex flex-col items-center mt-4">
         <div className="flex justify-center items-center">
-            <button
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
             disabled={currentPage === 1}
-            >
+          >
             {"<"}
-            </button>
+          </button>
 
-            {[...Array(totalPages)].map((_, i) => (
-            <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"}`}
-            >
-                {i + 1}
-            </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((page) => {
+              if (totalPages <= 3) return true; // Jika total halaman ≤ 3, tampilkan semua
+              if (currentPage === 1) return page <= 3; // Jika di halaman pertama, tampilkan 1, 2, 3
+              if (currentPage === totalPages) return page >= totalPages - 2; // Jika di halaman terakhir, tampilkan totalPages-2, totalPages-1, totalPages
+              return page >= currentPage - 1 && page <= currentPage + 1; // Tampilkan currentPage - 1, currentPage, currentPage + 1
+            })
+            .map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+                  currentPage === page ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"
+                }`}
+              >
+                {page}
+              </button>
             ))}
 
-            <button
+          <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"}`}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
             disabled={currentPage === totalPages}
-            >
+          >
             {">"}
-            </button>
+          </button>
         </div>
       </div>
     </div>
