@@ -2,7 +2,17 @@ import api from "./api";
 
 const token = localStorage.getItem("token");
 
-export const getCampuses = async (page = 1, limit = 10) => {
+export const getCampuses = async () => {
+    try {
+      const response = await api.get("/campuses");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching campus:", error);
+      throw error.response?.data || "Failed to fetch campus";
+    }
+  };
+
+export const getCampusesPaginate = async (page = 1, limit = 10) => {
   try {
     const response = await api.get("/admin/campus", {
       params: { page, limit },

@@ -22,6 +22,16 @@ export const getReports = async (
     }
 };
 
+export const createReport = async (reportData) => {
+    try {
+      const response = await api.post("/reports", reportData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating report:", error);
+      throw error.response?.data || "Failed to create report";
+    }
+  };
+  
 export const updateReportStatus = async (reportId, status) => {
     try {
         const response = await api.put(

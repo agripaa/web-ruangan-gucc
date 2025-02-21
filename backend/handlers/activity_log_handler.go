@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +11,28 @@ import (
 func GetActivityLogs(c *fiber.Ctx) error {
 	var logs []models.ActivityLog
 	config.DB.Preload("User").Preload("Report").Find(&logs)
+	return c.JSON(logs)
+}
+
+func GetCreateReportLogs(c *fiber.Ctx) error {
+	var logs []models.ActivityLog
+	config.DB.Preload("User").Preload("Report").
+		Where("type_log = ?", "create report").
+		Order("timestamp DESC").
+		Limit(15).
+		Find(&logs)
+
+	return c.JSON(logs)
+}
+
+func GetUpdateReportLogs(c *fiber.Ctx) error {
+	var logs []models.ActivityLog
+	config.DB.Preload("User").Preload("Report").
+		Where("type_log = ?", "update report").
+		Order("timestamp DESC").
+		Limit(15).
+		Find(&logs)
+
 	return c.JSON(logs)
 }
 
@@ -32,6 +55,7 @@ func CreateActivityLog(c *fiber.Ctx) error {
 	}
 
 	log.UserID = &userID
+	log.Timestamp = time.Now()
 
 	result := config.DB.Create(&log)
 	if result.Error != nil {

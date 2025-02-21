@@ -18,3 +18,7 @@ export const register = async (userData) => {
         throw error.response?.data || "Registration failed";
     }
 };
+
+export const logoutUser = () => {
+    localStorage.removeItem("token");
+  };  

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getCampuses, createCampus, updateCampus, deleteCampus } from "@/services/campus";
+import { getCampusesPaginate, createCampus, updateCampus, deleteCampus } from "@/services/campus";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6";
 import Swal from "sweetalert2";
@@ -20,7 +20,7 @@ const Campus = () => {
 
   const fetchCampuses = async () => {
     try {
-      const data = await getCampuses(currentPage, 10);
+      const data = await getCampusesPaginate(currentPage, 10);
       setCampuses(data?.data || []); 
       setTotalPages(data?.total_pages || 1);
     } catch (error) {
