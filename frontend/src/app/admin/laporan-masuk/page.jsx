@@ -1,23 +1,56 @@
 "use client";
-import React, { useState } from "react";
-import { FaFileAlt, FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { getReports, updateReportStatus } from "@/services/reports";
+import { FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 
-const AdminPage = () => {
-  const [reports, setReports] = useState([
-    { token: "sdb-9rb31ib-djh9x", room: "D421", technician: "-", status: "Belum diambil", action: ["Ambil", "Tidak"] },
-    { token: "sdb-9rb31ib-djh9x", room: "D411", technician: "Setiyoko Adi P.", status: "Dalam Proses", action: [] },
-    { token: "sdb-9rb31ib-djh9x", room: "D431", technician: "Abel Dimas S.", status: "Dalam Perjalanan", action: [] },
-    { token: "sdb-9rb31ib-djh9x", room: "D441", technician: "Setiyoko Adi P.", status: "Selesai", action: ["Selesai"] },
-    { token: "sdb-9rb31ib-djh9x", room: "D451", technician: "Doni Saputra", status: "Dalam Proses", action: [] },
-    { token: "sdb-9rb31ib-djh9x", room: "D461", technician: "Budi Santoso", status: "Belum diambil", action: ["Ambil", "Tidak"] },
-  ]);
+const months = [
+  { label: "Januari", value: "01" },
+  { label: "Februari", value: "02" },
+  { label: "Maret", value: "03" },
+  { label: "April", value: "04" },
+  { label: "Mei", value: "05" },
+  { label: "Juni", value: "06" },
+  { label: "Juli", value: "07" },
+  { label: "Agustus", value: "08" },
+  { label: "September", value: "09" },
+  { label: "Oktober", value: "10" },
+  { label: "November", value: "11" },
+  { label: "Desember", value: "12" },
+];
 
+const years = ["2023", "2024", "2025"];
+
+const getLastDayOfMonth = (year, month) => {
+  return new Date(year, month, 0).getDate(); // Mendapatkan tanggal terakhir dalam bulan
+};
+
+const LaporanMasuk = () => {
+  const [reports, setReports] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
-  const totalPages = Math.ceil(reports.length / itemsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
 
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [selectedMonth, setSelectedMonth] = useState("02"); // Default Februari
+  const [selectedYear, setSelectedYear] = useState("2024");
+
+  useEffect(() => {
+    fetchReports();
+  }, [currentPage, sortConfig, selectedMonth, selectedYear]);
+
+  const fetchReports = async () => {
+    const lastDay = getLastDayOfMonth(parseInt(selectedYear), parseInt(selectedMonth));
+    const startDate = `${selectedYear}-${selectedMonth}-01`;
+    const endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
+
+    try {
+      const data = await getReports(currentPage, 10, sortConfig.key, sortConfig.direction, startDate, endDate);
+      setReports(data.data);
+      setTotalPages(data.total_pages);
+    } catch (error) {
+      console.error("Failed to fetch reports:", error);
+    }
+  };
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -25,35 +58,56 @@ const AdminPage = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
-
-    const sortedReports = [...reports].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setReports(sortedReports);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentReports = reports.slice(indexOfFirstItem, indexOfLastItem);
+  const handleStatusUpdate = async (reportId, newStatus) => {
+    try {
+      await updateReportStatus(reportId, newStatus);
+      fetchReports();
+    } catch (error) {
+      console.error("Failed to update report status:", error);
+    }
+  };
+
+  console.log(reports)
 
   return (
     <div>
       {/* Lists Pengaduan Header */}
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center">
-            <div className="flex justify-center p-3 shrink-0 bg-[#F6F6F6] rounded-xl mr-4">
-                <IoDocumentTextOutline className="text-gray-600 text-2xl" />
-            </div>
-            <h2 className="text-md font-normal">Lists Pengaduan</h2>
+          <div className="flex justify-center p-3 shrink-0 bg-[#F6F6F6] rounded-xl mr-4">
+            <IoDocumentTextOutline className="text-gray-600 text-2xl" />
+          </div>
+          <h2 className="text-md font-normal">Lists Pengaduan</h2>
         </div>
 
+        {/* Dropdown Filter Periode */}
         <div className="flex items-center gap-2">
           <span className="text-gray-500 text-sm">Periode:</span>
-          <div className="flex items-center bg-[#F9F9F9] px-3 py-3 rounded-lg border-none w-52 justify-between">
-            <span className="text-gray-700">1-28 Feb, 2024</span>
+          <div className="flex items-center bg-[#F9F9F9] px-3 py-2 rounded-lg border-none">
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-transparent text-gray-700 outline-none cursor-pointer"
+            >
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="bg-transparent text-gray-700 outline-none cursor-pointer ml-2"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
             <div className="bg-[#ECECEC] p-2 ml-2 rounded-md cursor-pointer">
               <FaChevronDown className="text-gray-600" />
             </div>
@@ -64,65 +118,65 @@ const AdminPage = () => {
       {/* Table */}
       <div className="mt-6 overflow-x-auto">
         <table className="w-full border-collapse shadow-md">
-            <thead>
-                <tr className="bg-[#3C64FF] text-white">
-                    <th className="p-3 text-left">Token</th>
-
-                    {/* Sorting Ruangan */}
-                    <th 
-                    className="p-3 text-left cursor-pointer"
-                    onClick={() => handleSort("room")}
-                    >
-                    <span className="inline-flex items-center gap-3">
-                        Ruangan
-                        <div className="flex flex-col">
-                        <FaSortUp className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
-                        <FaSortDown className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
-                        </div>
-                    </span>
-                    </th>
-
-                    {/* Sorting Teknisi */}
-                    <th 
-                    className="p-3 text-left cursor-pointer"
-                    onClick={() => handleSort("technician")}
-                    >
-                    <span className="inline-flex items-center gap-3">
-                        Teknisi
-                        <div className="flex flex-col">
-                        <FaSortUp className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
-                        <FaSortDown className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
-                        </div>
-                    </span>
-                    </th>
-
-                    <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-left">Action</th>
-                </tr>
-                </thead>
-
-
+          <thead>
+            <tr className="bg-[#3C64FF] text-white">
+              <th className="p-3 text-left">Token</th>
+              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("room")}>
+                <span className="inline-flex items-center gap-3">
+                  Ruangan
+                  <div className="flex flex-col">
+                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                </span>
+              </th>
+              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("technician")}>
+                <span className="inline-flex items-center gap-3">
+                  Teknisi
+                  <div className="flex flex-col">
+                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                </span>
+              </th>
+              <th className="p-3 text-left">Tanggal Laporan</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Action</th>
+            </tr>
+          </thead>
           <tbody className="bg-white">
-            {currentReports.map((report, index) => (
+            {reports.map((report, index) => (
               <tr key={index} className="border-b">
                 <td className="p-3">{report.token}</td>
                 <td className="p-3">{report.room}</td>
-                <td className="p-3">{report.technician}</td>
+                <td className="p-3">{report.worker ? report.worker.username : "-"}</td>
+                <td className="p-3">{new Date(report.reported_at).toLocaleDateString()}</td>
                 <td className="p-3">{report.status}</td>
                 <td className="p-3">
-                  {report.action.length > 0 &&
-                    report.action.map((btn, i) => (
-                      <button
-                        key={i}
-                        className={`text-white px-3 py-1 text-sm rounded-md shadow-md mr-2
-                        ${btn === "Ambil" ? "bg-blue-600 hover:bg-blue-700" : ""}
-                        ${btn === "Tidak" ? "bg-red-600 hover:bg-red-700" : ""}
-                        ${btn === "Selesai" ? "bg-blue-600 hover:bg-blue-700" : ""}
-                      `}
-                      >
-                        {btn}
-                      </button>
-                    ))}
+                  {report.status === "pending" && (
+                    <button
+                      onClick={() => handleStatusUpdate(report.ID, "on the way")}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                    >
+                      Ambil
+                    </button>
+                  )}
+                  {report.status === "on the way" && (
+                    <button
+                      onClick={() => handleStatusUpdate(report.ID, "in progress")}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-md"
+                    >
+                      Progress
+                    </button>
+                  )}
+                  {report.status === "in progress" && (
+                    <button
+                      onClick={() => handleStatusUpdate(report.ID, "done")}
+                      className="bg-green-500 text-white px-3 py-1 rounded-md"
+                    >
+                      Selesai
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -130,8 +184,8 @@ const AdminPage = () => {
         </table>
       </div>
 
-      {/* Wrapper agar pagination tetap di bawah tabel */}
-      <div className="flex flex-col items-center mt-4">
+{/* Wrapper agar pagination tetap di bawah tabel */}
+<div className="flex flex-col items-center mt-4">
         <div className="flex justify-center items-center">
             <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -164,4 +218,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default LaporanMasuk;

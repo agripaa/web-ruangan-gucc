@@ -15,6 +15,10 @@ import (
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+type UpdateStatusRequest struct {
+	Status string `json:"status"`
+}
+
 func generateUniqueToken(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	var token string
@@ -192,6 +196,55 @@ func UpdateReport(c *fiber.Ctx) error {
 	updateData.UpdatedAt = time.Now()
 
 	config.DB.Model(&report).Updates(updateData)
+	return c.JSON(report)
+}
+
+func UpdateReportStatus(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var report models.Report
+
+	if err := config.DB.First(&report, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
+	}
+
+	// Ambil data dari request body
+	type UpdateStatusRequest struct {
+		Status string `json:"status"`
+	}
+	var req UpdateStatusRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	// Pastikan status valid
+	switch req.Status {
+	case "on the way":
+		if report.Status != "pending" {
+			return c.Status(400).JSON(fiber.Map{"error": "Report must be pending to be assigned"})
+		}
+		// Ambil user_id dari token yang sudah di-authenticate
+		userID, ok := c.Locals("user_id").(uint)
+		if !ok {
+			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
+		}
+		report.WorkerID = &userID
+	case "in progress":
+		if report.Status != "on the way" {
+			return c.Status(400).JSON(fiber.Map{"error": "Report must be on the way to be in progress"})
+		}
+	case "done":
+		if report.Status != "in progress" {
+			return c.Status(400).JSON(fiber.Map{"error": "Report must be in progress to be marked as done"})
+		}
+	default:
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid status update"})
+	}
+
+	report.Status = req.Status
+	report.UpdatedAt = time.Now()
+
+	config.DB.Save(&report)
+
 	return c.JSON(report)
 }
 

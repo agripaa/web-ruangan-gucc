@@ -13,24 +13,22 @@ type Report struct {
 	PhoneNumber string    `gorm:"type:varchar(25);not null" json:"phone_number"`
 	Room        string    `gorm:"type:varchar(25);not null" json:"room"`
 	CampusID    uint      `gorm:"not null" json:"campus_id"`
+	WorkerID    *uint     `gorm:"default:null" json:"worker_id"` // Foreign key to User
 	Status      string    `gorm:"type:status_enum;not null;default:'pending'" json:"status"`
 	Description string    `gorm:"type:text" json:"description"`
 	ReportedAt  time.Time `gorm:"type:timestamp" json:"reported_at"`
 	UpdatedAt   time.Time `gorm:"type:timestamp" json:"updated_at"`
 	Campus      Campus    `gorm:"foreignKey:CampusID"`
+	Worker      *User     `gorm:"foreignKey:WorkerID" json:"worker"` // Relasi ke User
 }
 
 func MigrateReports(db *gorm.DB) {
-	db.Exec(`DO $$
-	BEGIN
+	db.Exec(`DO $$ 
+	BEGIN 
 		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_enum') THEN
 			CREATE TYPE status_enum AS ENUM ('pending', 'on the way', 'in progress', 'done');
-		ELSE
-			ALTER TYPE status_enum ADD VALUE IF NOT EXISTS 'on the way';
 		END IF;
 	END $$;`)
-	db.Exec("DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='reports' AND column_name='room_id') THEN ALTER TABLE reports DROP COLUMN room_id; END IF; END $$;")
-	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='reports' AND column_name='reported_at') THEN ALTER TABLE reports ADD COLUMN reported_at TIMESTAMP; END IF; END $$;")
-	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='reports' AND column_name='updated_at') THEN ALTER TABLE reports ADD COLUMN updated_at TIMESTAMP; END IF; END $$;")
+	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='reports' AND column_name='worker_id') THEN ALTER TABLE reports ADD COLUMN worker_id INTEGER NULL; END IF; END $$;")
 	db.AutoMigrate(&Report{})
 }
