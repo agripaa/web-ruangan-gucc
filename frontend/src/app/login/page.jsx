@@ -3,9 +3,31 @@ import React, { useState } from "react";
 import Image from "next/image";
 import LogoGUCC from "@/assets/Logo GUCC.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { login } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const data = await login(credentials.username, credentials.password);
+      localStorage.setItem("token", data.token); 
+      router.push("/admin"); 
+    } catch (err) {
+      setError(err.error || "Login gagal, periksa kembali username dan password.");
+    }
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -19,8 +41,11 @@ const Login = () => {
         {/* Title */}
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
+        {/* Error Message */}
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
         {/* Login Form */}
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Username Field */}
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-2">
@@ -28,8 +53,12 @@ const Login = () => {
             </label>
             <input
               type="text"
+              name="username"
+              value={credentials.username}
+              onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               placeholder="Enter your username"
+              required
             />
           </div>
 
@@ -41,8 +70,12 @@ const Login = () => {
             <div className="relative">
               <input
                 type={passwordVisible ? "text" : "password"}
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
                 placeholder="Enter your password"
+                required
               />
               {/* Eye Icon to Toggle Password Visibility */}
               <span
