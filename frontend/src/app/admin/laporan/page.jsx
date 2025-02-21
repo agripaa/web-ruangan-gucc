@@ -19,7 +19,7 @@ const months = [
   { label: "Desember", value: "12" },
 ];
 
-const years = ["2023", "2024", "2025"];
+const years = ["2025", "2026", "2027"];
 
 const Laporan = () => {
   const [reports, setReports] = useState([]);
@@ -27,10 +27,12 @@ const Laporan = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
 
-  // Default: Current Month & Year
-  const currentDate = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const today = new Date();
+  const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0"); 
+  const currentYear = today.getFullYear().toString();
+
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   useEffect(() => {
     fetchReports();
