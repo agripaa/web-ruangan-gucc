@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { getCampuses } from "@/services/campus";
 import { createReport } from "@/services/reports";
 import { logoutUser } from "@/services/auth";
-import { getActivityLogs } from "@/services/logs";
+import { getActivityCreateReportLog, createActivityLog } from "@/services/logs";
 import { FaBell, FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import LogoGunadarma from "@/assets/Universitas Gunadarma.png";
@@ -42,22 +42,34 @@ const Header = () => {
 
   const fetchNotifications = async () => {
     try {
-      const logs = await getActivityLogs();
+      const logs = await getActivityCreateReportLog();
       setNotifications(logs || []);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     }
   };
 
-  // Handle perubahan input form
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "campus_id" ? parseInt(value, 10) || "" : value, 
+    });
   };
 
   // Handle submit pengaduan
   const handleSubmit = async () => {
     try {
-      await createReport(formData);
+      console.log({formData})
+      const new_report = await createReport(formData);
+      console.log({new_report})
+      await createActivityLog({
+        type_log: "create report",
+        action: `${formData.username} Create Report`,
+        detail_action: `Report Room: ${formData.room} => ${formData.description}`,
+        target_report_id: new_report.ID,
+        user_id: null,
+      })
       Swal.fire("Success", "Report submitted successfully!", "success");
       setIsReportModalOpen(false);
     } catch (error) {
@@ -71,6 +83,8 @@ const Header = () => {
     logoutUser();
     router.push("/login"); // Redirect ke halaman login setelah logout
   };
+
+  console.log({notifications})
 
   return (
     <header className="w-full flex justify-between items-center p-5 px-7 bg-white">
@@ -94,7 +108,10 @@ const Header = () => {
               )}
             </div>
 
-            <button className="text-white bg-red-600 cursor-pointer hover:bg-red-800 py-2 px-4 font-semibold rounded-xl">
+            <button 
+              className="text-white bg-red-600 cursor-pointer hover:bg-red-800 py-2 px-4 font-semibold rounded-xl"
+              onClick={() => handleLogout()}
+            >
               Logout
             </button>
           </div>
@@ -215,20 +232,22 @@ const Header = () => {
             notifications.map((notif, index) => (
               <div key={index} className="p-3 border-b last:border-none">
                 <p className="text-gray-600 text-sm">
-                  {new Date(notif.Timestamp).toLocaleDateString("id-ID")}
+                  {notif.timestamp && new Date(notif.timestamp).toString() !== "Invalid Date"
+                    ? new Date(notif.timestamp).toLocaleDateString("id-ID", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
+                    : "No Date Available"}
                 </p>
-                <p className="font-semibold">{notif.User?.Username || "Unknown User"}</p>
+                <p className="font-semibold">{notif.action || "No Action Data"}</p>
                 <p className="text-gray-700">
                   {notif.Report
-                    ? `Campus: Kampus ${notif.Report.campus_id} - Room ${notif.Report.room}`
+                    ? notif.detail_action
                     : "No report data available"}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {notif.Report?.description
-                    ? notif.Report.description.length > 50
-                      ? `${notif.Report.description.substring(0, 50)}...`
-                      : notif.Report.description
-                    : "No description available"}
                 </p>
               </div>
             ))

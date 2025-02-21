@@ -15,6 +15,7 @@ func SetupRoutes(app *fiber.App) {
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
 
+	api.Post("/logs", handlers.CreateActivityLog)
 	api.Get("/create-report", handlers.GetCreateReportLogs)
 	api.Get("/update-report", handlers.GetUpdateReportLogs)
 
@@ -42,7 +43,6 @@ func SetupRoutes(app *fiber.App) {
 	activityLogs := admin.Group("/activity-logs")
 	activityLogs.Get("/", handlers.GetActivityLogs)
 	activityLogs.Get("/:id", handlers.GetActivityLogByID)
-	activityLogs.Post("/", handlers.CreateActivityLog)
 	activityLogs.Put("/:id", handlers.UpdateActivityLog)
 	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
 
