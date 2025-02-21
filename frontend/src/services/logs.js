@@ -19,7 +19,7 @@ export const getActivityLogs = async () => {
 export const getActivityCreateReportLog = async () => {
   try {
     const response = await api.get("/create-report");
-    return response.data;
+    return response.data.length > 0 ? response.data : [];
   } catch (error) {
     console.error("Error fetching create report logs:", error);
     return [];
@@ -27,14 +27,14 @@ export const getActivityCreateReportLog = async () => {
 };
 
 export const getActivityUpdateReportLog = async () => {
-  try {
-    const response = await api.get("/update-report");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching update report logs:", error);
-    return [];
-  }
-};
+    try {
+      const response = await api.get("/update-report");
+      return response.data.length > 0 ? response.data : [];
+    } catch (error) {
+      console.error("Error fetching update report logs:", error);
+      return [];
+    }
+  };  
 
 export const createActivityLog = async (logData) => {
   try {
