@@ -21,10 +21,6 @@ const months = [
 
 const years = ["2023", "2024", "2025"];
 
-const getLastDayOfMonth = (year, month) => {
-  return new Date(year, month, 0).getDate(); // Mendapatkan tanggal terakhir dalam bulan
-};
-
 const LaporanMasuk = () => {
   const [reports, setReports] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,19 +28,15 @@ const LaporanMasuk = () => {
   const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
 
   const [selectedMonth, setSelectedMonth] = useState("02"); // Default Februari
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedYear, setSelectedYear] = useState("2025");
 
   useEffect(() => {
     fetchReports();
   }, [currentPage, sortConfig, selectedMonth, selectedYear]);
 
   const fetchReports = async () => {
-    const lastDay = getLastDayOfMonth(parseInt(selectedYear), parseInt(selectedMonth));
-    const startDate = `${selectedYear}-${selectedMonth}-01`;
-    const endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
-
     try {
-      const data = await getReports(currentPage, 10, sortConfig.key, sortConfig.direction, startDate, endDate);
+      const data = await getReports(currentPage, 10, sortConfig.key, sortConfig.direction, selectedMonth, selectedYear);
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
@@ -70,7 +62,6 @@ const LaporanMasuk = () => {
   };
 
   console.log(reports)
-
   return (
     <div>
       {/* Lists Pengaduan Header */}
@@ -108,9 +99,6 @@ const LaporanMasuk = () => {
                 </option>
               ))}
             </select>
-            <div className="bg-[#ECECEC] p-2 ml-2 rounded-md cursor-pointer">
-              <FaChevronDown className="text-gray-600" />
-            </div>
           </div>
         </div>
       </div>
@@ -145,11 +133,12 @@ const LaporanMasuk = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-            {reports.map((report, index) => (
+          {reports?.length > 0 ? (
+            reports.map((report, index) => (
               <tr key={index} className="border-b">
                 <td className="p-3">{report.token}</td>
                 <td className="p-3">{report.room}</td>
-                <td className="p-3">{report.worker ? report.worker.username : "-"}</td>
+                <td className="p-3">{report.worker ? report.worker.Username : "-"}</td>
                 <td className="p-3">{new Date(report.reported_at).toLocaleDateString()}</td>
                 <td className="p-3">{report.status}</td>
                 <td className="p-3">
@@ -179,7 +168,15 @@ const LaporanMasuk = () => {
                   )}
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="p-3 text-center text-gray-500">
+                Tidak ada laporan masuk
+              </td>
+            </tr>
+          )}
+
           </tbody>
         </table>
       </div>
