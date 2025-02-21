@@ -20,7 +20,6 @@ const Sidebar = () => {
         await getProfile(); // Jika token valid
         setTokenValid(true);
       } catch (error) {
-        console.error("Unauthorized - Redirecting to login", error);
         localStorage.removeItem("token");
         setTokenValid(false);
       } finally {

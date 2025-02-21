@@ -7,7 +7,6 @@ export const getCampuses = async () => {
       const response = await api.get("/campuses");
       return response.data;
     } catch (error) {
-      console.error("Error fetching campus:", error);
       throw error.response?.data || "Failed to fetch campus";
     }
   };
@@ -20,7 +19,6 @@ export const getCampusesPaginate = async (page = 1, limit = 10) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching campus:", error);
     throw error.response?.data || "Failed to fetch campus";
   }
 };
@@ -32,7 +30,6 @@ export const getCampusById = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching campus:", error);
     throw error.response?.data || "Failed to fetch campus";
   }
 };
@@ -44,7 +41,6 @@ export const createCampus = async (campusData) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating campus:", error);
     throw error.response?.data || "Failed to create campus";
   }
 };
@@ -56,7 +52,6 @@ export const updateCampus = async (id, campusData) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating campus:", error);
     throw error.response?.data || "Failed to update campus";
   }
 };
@@ -68,7 +63,6 @@ export const deleteCampus = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting campus:", error);
     throw error.response?.data || "Failed to delete campus";
   }
 };

@@ -36,7 +36,7 @@ const Header = () => {
       const data = await getCampuses();
       setCampuses(data || []);
     } catch (error) {
-      console.error("Failed to fetch campuses:", error);
+      return error
     }
   };
 
@@ -45,7 +45,7 @@ const Header = () => {
       const logs = await getActivityCreateReportLog();
       setNotifications(logs || []);
     } catch (error) {
-      console.error("Failed to fetch notifications:", error);
+      return error
     }
   };
 
@@ -60,9 +60,7 @@ const Header = () => {
   // Handle submit pengaduan
   const handleSubmit = async () => {
     try {
-      console.log({formData})
       const new_report = await createReport(formData);
-      console.log({new_report})
       await createActivityLog({
         type_log: "create report",
         action: `${formData.username} Create Report`,
@@ -74,7 +72,6 @@ const Header = () => {
       setIsReportModalOpen(false);
     } catch (error) {
       Swal.fire("Error", "Failed to submit report!", "error");
-      console.error("Failed to submit report:", error);
     }
   };
 
@@ -83,8 +80,6 @@ const Header = () => {
     logoutUser();
     router.push("/login"); // Redirect ke halaman login setelah logout
   };
-
-  console.log({notifications})
 
   return (
     <header className="w-full flex justify-between items-center p-5 px-7 bg-white">

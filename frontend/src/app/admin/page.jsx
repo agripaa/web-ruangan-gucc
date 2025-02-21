@@ -31,7 +31,7 @@ const Dashboard = () => {
         setActivityLog(logs);
       }
     } catch (error) {
-      console.error("Failed to fetch update report logs:", error);
+      return error
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ const Dashboard = () => {
         value: item.count
       })));
     } catch (error) {
-      console.error("Failed to fetch report stats:", error);
+      return error
     }
   };
 

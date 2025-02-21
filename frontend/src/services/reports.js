@@ -17,7 +17,6 @@ export const getReports = async (
         });
         return response.data;
     } catch (error) {
-        console.error("Error fetching reports:", error);
         throw error.response?.data || "Failed to fetch reports";
     }
 };
@@ -27,7 +26,6 @@ export const createReport = async (reportData) => {
       const response = await api.post("/reports", reportData);
       return response.data;
     } catch (error) {
-      console.error("Error creating report:", error);
       throw error.response?.data || "Failed to create report";
     }
   };
@@ -41,7 +39,6 @@ export const updateReportStatus = async (reportId, status) => {
         );
         return response.data;
     } catch (error) {
-        console.error("Error updating report status:", error);
         throw error.response?.data || "Failed to update report status";
     }
 };
@@ -62,7 +59,6 @@ export const downloadExcel = async (month = "", year = "") => {
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Error downloading Excel:", error);
         throw error.response?.data || "Failed to download Excel";
     }
 };
@@ -83,7 +79,6 @@ export const downloadPDF = async (month = "", year = "") => {
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Error downloading PDF:", error);
         throw error.response?.data || "Failed to download PDF";
     }
 };
@@ -97,7 +92,6 @@ export const getReportStatusCounts = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching report status counts:", error);
     return [];
   }
 };

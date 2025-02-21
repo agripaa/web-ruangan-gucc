@@ -46,7 +46,7 @@ const LaporanMasuk = () => {
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
-      console.error("Failed to fetch reports:", error);
+      return error
     }
   };
 
@@ -86,7 +86,7 @@ const LaporanMasuk = () => {
       fetchReports(); // Refresh data setelah update status
       Swal.fire("Success", `Status changed to ${nextStatus}`, "success");
     } catch (error) {
-      console.error("Failed to update report status:", error);
+      return error
       Swal.fire("Error", "Failed to update report status!", "error");
     }
   };

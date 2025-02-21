@@ -9,10 +9,8 @@ export const getProfile = async () => {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Profile Response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error fetching profile:", error);
         throw error.response?.data || "Failed to fetch profile";
     }
 };

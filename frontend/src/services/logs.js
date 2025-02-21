@@ -11,7 +11,6 @@ export const getActivityLogs = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching logs:", error);
     return [];
   }
 };
@@ -21,7 +20,6 @@ export const getActivityCreateReportLog = async () => {
     const response = await api.get("/create-report");
     return response.data.length > 0 ? response.data : [];
   } catch (error) {
-    console.error("Error fetching create report logs:", error);
     return [];
   }
 };
@@ -31,7 +29,6 @@ export const getActivityUpdateReportLog = async () => {
       const response = await api.get("/update-report");
       return response.data.length > 0 ? response.data : [];
     } catch (error) {
-      console.error("Error fetching update report logs:", error);
       return [];
     }
   };  
@@ -41,7 +38,6 @@ export const createActivityLog = async (logData) => {
     const response = await api.post("/logs", logData);
     return response.data;
   } catch (error) {
-    console.error("Error creating activity log:", error);
     throw error.response?.data || "Failed to create log";
   }
 };
@@ -55,7 +51,6 @@ export const updateActivityLog = async (id, logData) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating activity log:", error);
     throw error.response?.data || "Failed to update log";
   }
 };
@@ -69,7 +64,6 @@ export const deleteActivityLog = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting activity log:", error);
     throw error.response?.data || "Failed to delete log";
   }
 };

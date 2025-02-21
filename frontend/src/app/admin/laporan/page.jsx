@@ -45,7 +45,7 @@ const Laporan = () => {
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
-      console.error("Failed to fetch reports:", error);
+      return error
     }
   };
 

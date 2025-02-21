@@ -17,7 +17,6 @@ const Profile = () => {
         const userProfile = await getProfile(token);
         setProfile(userProfile);
       } catch (error) {
-        console.error("Profile fetch error:", error);
         setError("Failed to load profile");
       } finally {
         setLoading(false);
@@ -26,8 +25,6 @@ const Profile = () => {
     
     fetchProfile();
   }, []);
-
-  console.log("Profile Data:", profile);
 
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
