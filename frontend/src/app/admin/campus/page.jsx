@@ -21,6 +21,7 @@ const Campus = () => {
   const fetchCampuses = async () => {
     try {
       const data = await getCampusesPaginate(currentPage, 10);
+      console.log(data)
       setCampuses(data?.data || []); 
       setTotalPages(data?.total_pages || 1);
     } catch (error) {

@@ -48,7 +48,7 @@ func SetupRoutes(app *fiber.App) {
 	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
 
 	campus := admin.Group("/campus")
-	campus.Get("/", handlers.GetCampuses)
+	campus.Get("/", handlers.GetCampusesPaginate)
 	campus.Get("/:id", handlers.GetCampusByID)
 	campus.Post("/", handlers.CreateCampus)
 	campus.Put("/:id", handlers.UpdateCampus)
