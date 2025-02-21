@@ -29,39 +29,533 @@
     font-size: 12px;
 }
 
-main {
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Agar tetap rapi di layar kecil */
+    margin-top: 3rem;
+    font-weight: 600;
+}
+
+.search-create {
     display: flex;
     flex-direction: row;
-    /* border: 1px solid black; */
-    margin-top: 40px;
-    align-items: start;
-    justify-content: space-between;
+    gap: 7px;
 }
 
-form {
-    width: 42%;
+.search-bar {
+    display: flex;
+    flex-direction: row;
 }
 
-form .form-name {
+.search-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 400;
+    margin-inline-end: 7px;
+    border: 1px solid #00000031;
+    border-radius: 25px;
+    padding: 5px 20px;
+}
+
+.search-input input {
+    width: 15rem;
+    outline: none;
+}
+
+.search-input input::placeholder {
+    font-style: italic;
+}
+
+.search-bar button {
+    font-size: 12px;
+    color: #fff;
+    background-color: #3C64FF;
+    border-radius: 25px;
+    padding: 5px 18px;
+}
+
+
+.form-create {
+    font-size: 12px;
+    color: #3C64FF;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #3C64FF;
+    padding-block: 5px;
+    padding-inline: 15px 5px;
+    border-radius: 25px;   
+    align-items: center;
+    gap: 10px;
+}
+
+/* Overlay full-screen */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Warna abu-abu transparan */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+
+.modal { 
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 1rem 2rem;
+
+    /* display: none; */
+}
+
+.modal-title {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    padding-block: 10px;
+    align-items: center;
+    font-weight: 500;
+}
+
+.form-name, .form-phone {
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     font-size: 13px;
     gap: 10px;
 }
 
+.back-icon, .search-icon {
+    cursor: pointer;
+}
+
 form input {
     border: 1px solid #00000028;
     border-radius: 25px;
-    padding: 15px 25px;
+    padding: 8px 25px;
     font-size: 12px;
+    outline: none;
 }
 
 form label {
     color: #33363F;
-    font-weight: 300;
+    font-weight: 400;
 }
 
-.track {
-    /* border: 1px solid #000; */
-    width: 42%;
+.location-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    font-size: 13px;
+}
+
+.location-container input {
+    width: 100%;
+    margin-top: 7px;
+}
+
+.form-location {
+    width: 45%;
+}
+
+.form-room {
+    width: 50%;
+}
+
+.form-room label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.desc {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+}
+
+.desc textarea {
+    margin-top: 7px;
+    border: 1px solid #00000028;
+    border-radius: 25px;
+    padding: 15px 25px;
+    font-size: 12px;
+    outline: none;
+    height: 150px;
+}
+
+.modal-footer .submit {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 13px;
+    align-items: center;
+}
+
+.modal-footer button {
+    background-color: #3C64FF;
+    border-radius: 25px;
+    color: #fff;
+    padding: 10px 25px;
+}
+
+.modal-footer p {
+    font-size: 9.5px;
+    width: 60%
+}
+
+.history {
+    font-weight: 600;
+    margin-top: 4rem;
+}
+
+.room-histories {
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+    background-color: #FCFCFC;
+    justify-content: center;
+    padding: 1rem;
+    margin-top: 1rem;
+    gap: 20px;
+    align-items: start;
+    max-height: 550px;
+    
+    overflow-y: auto;
+}
+
+.room-histories .rooms {
+    display: flex;
+    flex-direction: row;
+    border-radius: 15px;
+    background-color: #fff;
+    width: 100%;
+    padding: 1rem 2rem; 
+    justify-content: space-between;
+}
+
+.room-content .room-detail {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+.room-detail .room-status {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    background-color: #F7F7F7;
+    color: #787878;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 9px;
+    margin-bottom: 10px;
+}
+
+.rooms {
+    align-items: center;
+}
+
+.room-token {
+    color: #787878;
+}
+
+.rooms h2 {
+    font-size: 10px;
+    color: #000000;
+    font-weight: 300;
+    font-style: italic;
+}
+
+/* responsif */
+
+/* Tablet dan Laptop Kecil (≤ 1024px) */
+@media (max-width: 1024px) {
+    .main-container {
+        padding: 1.5rem;
+    }
+
+    .modal {
+        width: 60%;
+        padding: 1rem 1.5rem;
+    }
+
+    .search-input input {
+        width: 12rem;
+    }
+}
+
+/* Tablet Portrait dan Smartphone Besar (≤ 768px) */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        padding: 3rem;
+    }
+
+    .welcome {
+        display: none;
+    }
+
+    .search-container {
+        margin-top: 4rem;
+        flex-direction: column;
+    }
+
+    .search-title {
+        width: 40%;
+        align-self: flex-start;
+        margin-bottom: -27px;
+    }
+
+    .search-create {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .search-bar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-input {
+        width: 90%;
+        justify-content: center;
+    }
+
+    .form-create {
+        width: 30%;
+        justify-content: center;
+        font-size: 10px;
+        order: -1;
+        align-self: flex-end;
+    }
+
+    .plus-icon {
+        width: 12%;
+        height: 12%;
+    }
+
+    .modal {
+        width: 65%;
+        padding: 1rem;
+        font-size: 12px;
+    }
+
+    .modal-title {
+        gap: 15px;
+    }
+
+    .desc textarea {
+        height: 80px;
+    }
+
+    .location-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-location, .form-room {
+        width: 100%;
+    }
+
+    .modal-footer {
+        flex-direction: column;;
+    }
+
+    .modal-footer .submit {
+        gap: 15%;
+        align-items: center; 
+    }
+
+    .modal-footer button {
+        font-size: 8px;
+        width: 40%;
+    }
+
+    .modal-footer p {
+        width: 80%;
+        font-size: 8px;
+        margin-top: 10px;
+    }
+}
+/* Smartphone Kecil (≤ 480px) */
+@media (max-width: 532px) {
+    .form-create {
+        width: 40%;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding: 2rem 1rem;
+    }
+
+    .logo-UG {
+        width: 20px;
+        height: 20px;
+    }
+
+    .title-logo p {
+        font-size: 10px;
+    }
+
+    .search-container {
+        font-size: 10px;
+    }
+
+    .search-title {
+        width: 40%;
+        align-self: self-start;
+        z-index: 1;
+        margin-bottom: -22px;
+    }
+
+    .search-input {
+        padding: 0;
+        width: 100%;
+    }
+
+    .search-icon {
+        width: 10px;
+        height: 10px;
+    }
+
+    .search-input input {
+        font-size: 7px;
+        
+    }
+
+    .search-bar button {
+        font-size: 8px;
+        padding: 5px 10px;
+    }
+
+    .form-create {
+        font-size: 8px;
+        padding: 5px 5px;
+        width: 35%;
+        order: -1;
+        align-self: flex-end;
+    }
+
+    .plus-icon {
+        width: 12%;
+        height: 12%;
+    }
+
+    .modal {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    .modal-title {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .form-name, .form-phone, .form-location, .form-room, .desc{
+        font-size: 10px;
+        margin-top: 10px;
+    }
+
+    form input,
+    .desc textarea {
+        font-size: 7px;
+        padding: 6px 15px;
+    }
+
+    .desc textarea{
+        height: 150px;
+    }
+
+    .location-container {
+        flex-direction: row;
+        margin-top: 5px;
+    }
+
+    .modal-footer .submit{
+        flex-direction: column;
+        margin-bottom: 5px;
+    }
+
+    .modal-footer button {
+        width: 100%;
+        font-size: 8px;
+        padding: 8px 10px;
+    }
+
+    .submit p{
+        font-size: 8.5px;
+        width: 100%;
+    }
+
+    .history {
+        font-size: 10px;
+    }
+
+    .room-histories {
+        max-height: 400px;
+        /* background-color: rgb(240, 117, 117); */
+        padding: 5px;
+    }
+
+    .room-histories .rooms {
+        padding: 10px 10px;
+        font-size: 10px;
+    }
+
+    .room-detail .room-status {
+        padding: 3px;
+        align-items: center;
+    }
+
+    
+    .room-detail .room-status {
+        font-size: 7px;
+    }
+
+    .time-icon {
+        width: 8px;
+        height: 8px;
+    }
+
+    .room-token h2 {
+        font-size: 8px;
+    }
+
+}
+
+
+@media (max-width: 325px){
+    .search-container {
+        font-size: 8px;
+    }
+
+    .form-create {
+        width: 40%;
+        font-size: 6px;
+    }
 }

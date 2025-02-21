@@ -1,11 +1,21 @@
+"use client";
 import Image from "next/image";
-import '@/style/homepage.css'
-import Logo from '@/assets/Universitas Gunadarma.png'
+import '@/style/homepage.css';
+import Logo from '@/assets/Universitas Gunadarma.png';
+import Search from '@/assets/Search.png';
+import Plus from '@/assets/Plus.png';
+import Back from '@/assets/Back.png';
+import Arrow from '@/assets/room-arrow.png';
+import Time from '@/assets/time.png';
+import React, { useState } from "react";
+import ProgressBar from "@/components/progressBar";
+
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="main-container">
       <div className="title-logo">
-        <Image src={Logo} className="logo-UG" width={30} height={30} />
+        <Image src={Logo} className="logo-UG" width={30} height={30} alt="" />
         <p>UG Network Assistance</p>
       </div>
       
@@ -15,7 +25,32 @@ export default function Home() {
           <p>Kami siap membantu kapan saja dan dimana saja!</p>
         </div>
 
-        <main>
+        <div className="search-container">
+          <h3 className="search-title">Lacak Pengaduan</h3>
+
+          <div className="search-create">
+            <div className="search-bar">
+              <div className="search-input">
+                <Image src={Search} className="search-icon" width={15} height={15} alt=""/>
+                <input type="text" placeholder="Masukkan nomor pengaduan"></input>
+              </div>
+              <button>Lacak</button>
+            </div>
+
+            <button className="form-create" onClick={() => setIsOpen(true)}>
+              <h3>Buat pengaduan</h3>
+              <Image src={Plus} className="plus-icon" width={30} height={30} alt="" /> 
+            </button>
+          </div>
+        </div>
+
+        {isOpen && (
+          <div className="overlay" onClick={() => setIsOpen(false)}>
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-title">
+              <Image src={Back} className="back-icon" width={30} height={30} alt="" onClick={() => setIsOpen(false)}/>
+              <h1>Form Pengaduan</h1>
+          </div>
           <form>
             <div className="form-name">
               <label for="name">Nama lengkap *</label>
@@ -27,21 +62,25 @@ export default function Home() {
               <input type="text" placeholder="Phone number"></input>
             </div>
 
-            <div className="form-location">
-              <label for="kampus">Kampus *</label>
-              <input list="location" id="kampus" name="kampus"></input>
-              <datalist id="location">
-                <option value="Kampus D Margonda"></option>
-                <option value="Kampus E Kelapa Dua"></option>
-                <option value="Kampus G Kelapa Dua"></option>
-                <option value="Kampus H Kelapa Dua"></option>
-                <option value="Kampus J1 Kalimalang"></option>
-              </datalist>
-            </div>
+            <div className="location-container">
+              <div className="form-location">
+                <label for="kampus">Kampus *</label>
+                <input list="location" id="kampus" name="kampus" placeholder="Masukkan Kampus"></input>
+                <datalist id="location">
+                  <option value="Kampus D Margonda"></option>
+                  <option value="Kampus E Kelapa Dua"></option>
+                  <option value="Kampus G Kelapa Dua"></option>
+                  <option value="Kampus H Kelapa Dua"></option>
+                  <option value="Kampus J1 Kalimalang"></option>
+                </datalist>
+              </div>
 
-            <div className="form-room">
-              <label for="room">Ruangan *</label>
-              <input type="text" placeholder="Job location"></input>
+              <div className="form-room">
+                <label for="room">Ruangan *
+                <Image src={Arrow} className="arrow-icon" width={10} height={10} alt=""/>
+                </label>
+                <input type="text" placeholder="Job location"></input>
+              </div>
             </div>
 
             <div className="desc">
@@ -49,38 +88,63 @@ export default function Home() {
               <textarea placeholder="Type here"></textarea>
             </div>
 
-          <div className="footer">
-            <div className="submit">
-              <button>Kirim Pengaduan</button>
-              <p>
-                Teknisi kami siap membantu! Kirim pengaduan sekarang,
-                dan kami akan segera menuju lokasi Anda.
-              </p>
-            </div>
-          </div>
-
-          </form>
-
-          <div className="track">
-            <div className="track-search">
-              <label for="tracking">Lacak Pengaduan</label>
-              <input type="text" placeholder="Masukkan nomor pengaduan"></input>
-              <button className="tracking-submit">Lacak</button>
-            </div>
-            
-            <div className="track-icon">
-              ICON
-            </div>
-
-            <div className="track-history">
-              <h2>Riwayat Pengaduan</h2>
-              <div className="history-list">
-                a, b , c
+            <div className="modal-footer">
+              <div className="submit">
+                <button>Kirim Pengaduan</button>
+                <p>
+                  Teknisi kami siap membantu! Kirim pengaduan sekarang,
+                  dan kami akan segera menuju lokasi Anda.
+                </p>
               </div>
             </div>
-          </div>
-        </main>
+          </form>
+        </div>
+        </div>
+        )
+        }
       </section>
+      <ProgressBar currentStep={4} />
+
+      <div className="history">
+        <h1>Riwayat Pengaduan</h1>
+        <div className="room-histories">
+          <div className="rooms">
+
+            <div className="room-content">
+              <div className="room-detail">
+                <h1>Ruangan: D421</h1>
+                <div className="room-status">
+                  <Image src={Time} className="time-icon" width={13} height={13} alt="Dalam Proses"/>
+                  <p>Dalam Proses</p>
+                </div>
+              </div>
+              <div className="room-token">
+                <h2>Nomor Pengaduan. 234hjk2xf8n</h2>
+              </div>    
+            </div>
+            <h2>17/01/2025</h2>
+          </div>
+
+          <div className="rooms">
+
+            <div className="room-content">
+              <div className="room-detail">
+                <h1>Ruangan: D244</h1>
+                <div className="room-status">
+                  <Image src={Time} className="time-icon" width={13} height={13} alt="Dalam Proses"/>
+                  <p>Selesai</p>
+                </div>
+              </div>
+              <div className="room-token">
+                <h2>Nomor Pengaduan. 234hjk2xf8n</h2>
+              </div>    
+            </div>
+            <h2>17/01/2025</h2>
+          </div>
+
+          
+        </div>
+      </div>
     </div>
     
   );
