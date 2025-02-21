@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { getReports, updateReportStatus } from "@/services/reports";
-import { FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
+import { createActivityLog } from "@/services/logs";
+import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 const months = [
   { label: "Januari", value: "01" },
@@ -56,16 +58,39 @@ const LaporanMasuk = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleStatusUpdate = async (reportId, newStatus) => {
+  const handleStatusUpdate = async (report) => {
+    const statusFlow = {
+      pending: { next: "on the way", buttonText: "Ambil" },
+      "on the way": { next: "in progress", buttonText: "Progress" },
+      "in progress": { next: "done", buttonText: "Selesai" },
+    };
+
+    const currentStatus = report.status;
+    const nextStatus = statusFlow[currentStatus]?.next;
+    const buttonText = statusFlow[currentStatus]?.buttonText;
+
+    if (!nextStatus) return;
+
     try {
-      await updateReportStatus(reportId, newStatus);
-      fetchReports();
+      await updateReportStatus(report.ID, nextStatus);
+
+      // Simpan ke dalam activity logs
+      await createActivityLog({
+        type_log: "update report",
+        action: `${report.worker ? report.worker.Username : "Someone"} Update Report`,
+        detail_action: `Report Token: ${report.token} status changed from ${currentStatus} to ${nextStatus}`,
+        target_report_id: report.ID,
+        user_id: report.worker ? report.worker.ID : null,
+      });
+
+      fetchReports(); // Refresh data setelah update status
+      Swal.fire("Success", `Status changed to ${nextStatus}`, "success");
     } catch (error) {
       console.error("Failed to update report status:", error);
+      Swal.fire("Error", "Failed to update report status!", "error");
     }
   };
 
-  console.log(reports)
   return (
     <div>
       {/* Lists Pengaduan Header */}
@@ -137,50 +162,43 @@ const LaporanMasuk = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-          {reports?.length > 0 ? (
-            reports.map((report, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-3">{report.token}</td>
-                <td className="p-3">{report.room}</td>
-                <td className="p-3">{report.worker ? report.worker.Username : "-"}</td>
-                <td className="p-3">{new Date(report.reported_at).toLocaleDateString()}</td>
-                <td className="p-3">{report.status}</td>
-                <td className="p-3">
-                  {report.status === "pending" && (
-                    <button
-                      onClick={() => handleStatusUpdate(report.ID, "on the way")}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-md"
-                    >
-                      Ambil
-                    </button>
-                  )}
-                  {report.status === "on the way" && (
-                    <button
-                      onClick={() => handleStatusUpdate(report.ID, "in progress")}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded-md"
-                    >
-                      Progress
-                    </button>
-                  )}
-                  {report.status === "in progress" && (
-                    <button
-                      onClick={() => handleStatusUpdate(report.ID, "done")}
-                      className="bg-green-500 text-white px-3 py-1 rounded-md"
-                    >
-                      Selesai
-                    </button>
-                  )}
+            {reports?.length > 0 ? (
+              reports.map((report) => {
+                const statusFlow = {
+                  pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
+                  "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
+                  "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
+                };
+
+                const statusData = statusFlow[report.status];
+
+                return (
+                  <tr key={report.ID} className="border-b">
+                    <td className="p-3">{report.token}</td>
+                    <td className="p-3">{report.room}</td>
+                    <td className="p-3">{report.worker ? report.worker.Username : "-"}</td>
+                    <td className="p-3">{new Date(report.reported_at).toLocaleDateString()}</td>
+                    <td className="p-3">{report.status}</td>
+                    <td className="p-3">
+                      {statusData && (
+                        <button
+                          onClick={() => handleStatusUpdate(report)}
+                          className={`${statusData.color} text-white px-3 py-1 rounded-md`}
+                        >
+                          {statusData.buttonText}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="6" className="p-3 text-center text-gray-500">
+                  Tidak ada laporan masuk
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="p-3 text-center text-gray-500">
-                Tidak ada laporan masuk
-              </td>
-            </tr>
-          )}
-
+            )}
           </tbody>
         </table>
       </div>
