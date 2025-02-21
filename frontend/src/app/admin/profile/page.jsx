@@ -1,19 +1,43 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getProfile } from "@/services/user";
 import { FaUserCircle } from "react-icons/fa";
 
 const Profile = () => {
-  const user = {
-    username: "John Doe",
-    phoneNumber: "+62 812-3456-7890",
-  };
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found");
+
+        const userProfile = await getProfile(token);
+        setProfile(userProfile);
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, []);
+
+  console.log("Profile Data:", profile);
+
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="flex justify-center items-center h-[70vh]">
       <div className="bg-white shadow-md rounded-lg p-6 w-96 text-center">
         <FaUserCircle className="text-gray-500 text-9xl mx-auto mb-4" />
-        <h2 className="text-xl font-semibold">{user.username}</h2>
-        <p className="text-gray-500">{user.phoneNumber}</p>
+        <h2 className="text-xl font-semibold">{profile?.username || "Unknown User"}</h2>
+        <p className="text-gray-500">{profile?.phone_number || "No Phone Number"}</p>
       </div>
     </div>
   );

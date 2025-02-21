@@ -89,9 +89,10 @@ func Login(c *fiber.Ctx) error {
 }
 
 func GetProfile(c *fiber.Ctx) error {
-	userToken := c.Locals("user").(*jwt.Token)
-	claims := userToken.Claims.(jwt.MapClaims)
-	userID := claims["user_id"]
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - No User Found"})
+	}
 
 	var user models.User
 	if err := config.DB.First(&user, userID).Error; err != nil {

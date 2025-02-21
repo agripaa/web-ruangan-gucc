@@ -48,6 +48,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Missing User ID"})
 	}
 
+	// Simpan user_id sebagai integer
 	c.Locals("user_id", uint(userID))
 
 	return c.Next()
