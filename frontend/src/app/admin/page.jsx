@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { getReportStatusCounts } from "@/services/reports";
 
 const Dashboard = () => {
   const [activityLog, setActivityLog] = useState([]);
-  const [reportStats, setReportStats] = useState({});
+  const [reportStats, setReportStats] = useState([]);
 
   const formatDate = (isoString) => {
+
     return new Date(isoString).toLocaleDateString("id-ID", {
       year: "numeric",
       month: "long",
@@ -76,31 +78,24 @@ const Dashboard = () => {
     ];
 
     setActivityLog(dummyData);
-    processReportStats(dummyData);
   }, []);
 
-  const processReportStats = (data) => {
-    const statusCounts = {
-      pending: 0,
-      "in progress": 0,
-      "on the way": 0,
-      done: 0,
-    };
 
-    data.forEach((log) => {
-      const status = log.Report.status.toLowerCase();
-      if (statusCounts[status] !== undefined) {
-        statusCounts[status] += 1;
-      }
-    });
+  useEffect(() => {
+    fetchReportStats();
+  }, []);
 
-    setReportStats(statusCounts);
+  const fetchReportStats = async () => {
+    try {
+      const data = await getReportStatusCounts();
+      setReportStats(data.map(item => ({
+        name: item.status.toUpperCase(),
+        value: item.count
+      })));
+    } catch (error) {
+      console.error("Failed to fetch report stats:", error);
+    }
   };
-
-  const pieData = Object.keys(reportStats).map((key) => ({
-    name: key.toUpperCase(),
-    value: reportStats[key],
-  }));
 
   const COLORS = ["#FFBB28", "#FF8042", "#0088FE", "#00C49F"];
 
@@ -130,7 +125,7 @@ const Dashboard = () => {
         <h2 className="text-xl font-bold mb-4">Report Status Overview</h2>
         <PieChart width={280} height={280}>
           <Pie
-            data={pieData}
+            data={reportStats}
             cx="50%"
             cy="50%"
             labelLine={false}
@@ -138,7 +133,7 @@ const Dashboard = () => {
             fill="#8884d8"
             dataKey="value"
           >
-            {pieData.map((entry, index) => (
+            {reportStats.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>

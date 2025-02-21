@@ -32,6 +32,7 @@ func SetupRoutes(app *fiber.App) {
 	user.Get("/profile", handlers.GetProfile)
 
 	adminReports := admin.Group("/reports")
+	adminReports.Get("/status/count", handlers.GetReportStatusCounts)
 	adminReports.Get("/:id", handlers.GetReportByID)
 	adminReports.Get("/paginate/datum", handlers.GetReportPagination)
 	adminReports.Put("/:id", handlers.UpdateReport)

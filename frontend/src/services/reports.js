@@ -31,7 +31,7 @@ export const createReport = async (reportData) => {
       throw error.response?.data || "Failed to create report";
     }
   };
-  
+
 export const updateReportStatus = async (reportId, status) => {
     try {
         const response = await api.put(
@@ -86,4 +86,18 @@ export const downloadPDF = async (month = "", year = "") => {
         console.error("Error downloading PDF:", error);
         throw error.response?.data || "Failed to download PDF";
     }
+};
+
+export const getReportStatusCounts = async () => {
+  try {
+    const response = await api.get("/admin/reports/status/count", {
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching report status counts:", error);
+    return [];
+  }
 };

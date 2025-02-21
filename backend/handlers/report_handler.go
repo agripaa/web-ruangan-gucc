@@ -170,6 +170,22 @@ func ExportReportsToExcel(c *fiber.Ctx) error {
 	return c.Download(excelPath)
 }
 
+func GetReportStatusCounts(c *fiber.Ctx) error {
+	type StatusCount struct {
+		Status string `json:"status"`
+		Count  int    `json:"count"`
+	}
+
+	var counts []StatusCount
+	config.DB.Raw(`
+		SELECT status, COUNT(*) as count 
+		FROM reports 
+		GROUP BY status
+	`).Scan(&counts)
+
+	return c.JSON(counts)
+}
+
 func GetReports(c *fiber.Ctx) error {
 	var reports []models.Report
 	currentDate := time.Now().Format("2006-01-02")
