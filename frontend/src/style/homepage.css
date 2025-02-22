@@ -5,6 +5,14 @@
     padding: 2rem 3rem;
 }
 
+.form-location select {
+    margin-top: 7px;
+    padding: 8px 25px;
+    border-radius: 25px;
+    border: 1px solid #DEDEDE;
+    font-size: 12px;
+}
+
 .title-logo {
     display: flex;
     flex-direction: row;
@@ -176,6 +184,8 @@ form label {
 .form-location {
     width: 45%;
 }
+
+
 
 .form-room {
     width: 50%;
@@ -508,7 +518,6 @@ form label {
     }
 
     .submit p{
-        font-size: 8.5px;
         width: 100%;
     }
 

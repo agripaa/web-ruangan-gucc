@@ -2,6 +2,28 @@ import api from "./api";
 
 const token = localStorage.getItem("token");
 
+export const getAllReport = async () => {
+    try {
+        const response = await api.get("/reports");
+        return response.data;
+    } catch(error) {
+    console.error(error);
+    throw error.response?.data || "Failed to get data reports";
+  }
+};
+
+export const getReportByToken = async (token) => {
+    try {
+      const response = await api.get('/reports/search', {
+        params: {token}
+    });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error.response?.data || "Failed to get data report by Token";
+    }
+};
+
 export const getReports = async (
     page = 1,
     limit = 10,

@@ -3,53 +3,61 @@ import { FaFileAlt, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 
 const ProgressBar = ({ currentStep }) => {
+  if (currentStep === -1) {
+    return <h2 className="text-center text-red-500 text-lg font-bold mt-4">Pengaduan tidak ditemukan</h2>;
+  }
+
   const steps = [
-    { id: 1, label: "Pengaduan Diterima", icon: <FaFileAlt size={16} />, completed: currentStep >= 1 },
-    { id: 2, label: "Teknisi Dalam Perjalanan", icon: <FaMapMarkerAlt size={16} />, completed: currentStep >= 2 },
-    { id: 3, label: "Dalam Perbaikan", icon: <FaGear size={16} />, completed: currentStep >= 3 },
-    { id: 4, label: "Pengaduan Selesai", icon: <FaCheckCircle size={16} />, completed: currentStep >= 4 },
+    { id: 1, label: "Pengaduan Diterima", icon: FaFileAlt, completed: currentStep >= 1 },
+    { id: 2, label: "Teknisi Dalam Perjalanan", icon: FaMapMarkerAlt, completed: currentStep >= 2 },
+    { id: 3, label: "Dalam Perbaikan", icon: FaGear, completed: currentStep >= 3 },
+    { id: 4, label: "Pengaduan Selesai", icon: FaCheckCircle, completed: currentStep >= 4 },
   ];
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-4xl mx-auto mt-12">
-      {/* Progress Bar */}
-      <div className="absolute top-1 sm:top-1/2 md:top-1 left-1/2 translate-y-3 md:translate-y-5
-                      w-3/4 h-1 bg-gray-300 
-                      -translate-x-1/2">
-        <div
-          className="h-1 bg-blue-600 transition-all duration-300"
-          style={{
-            width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
-          }}
-        ></div>
+    <div className="relative flex flex-col items-center w-full max-w-4xl mx-auto mt-12 px-4">
+      {/* Progress Line - Dibagi berdasarkan jumlah step */}
+      <div className="absolute top-[50%] transform -translate-y-1/2 w-full sm:w-4/5 md:w-3/4 h-2 flex">
+        {steps.map((step, index) => {
+          if (index === steps.length - 1) return null; // Tidak ada garis setelah step terakhir
+          return (
+            <div
+              key={index}
+              className={`flex-1 transition-all duration-300 ${
+                currentStep > index + 1 ? "bg-blue-600" : "bg-gray-200"
+              }`}
+            />
+          );
+        })}
       </div>
 
       {/* Step Icons */}
-      <div className="relative flex w-full justify-between">
+      <div className="relative flex w-full justify-around items-center flex-wrap z-10">
         {steps.map((step) => (
           <div key={step.id} className="relative flex flex-col items-center w-1/4">
-            {/* Ikon Step */}
             <div
               className={`relative flex items-center justify-center 
-                          w-8 h-8 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-14 lg:h-14
-                          rounded-full border-4 
-                          ${step.completed ? "border-blue-600 text-blue-600" : "border-gray-400 text-gray-400"} 
-                          bg-white`}    
-                
-            
+                          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full border-4 text-lg
+                          ${
+                            step.completed
+                              ? "border-blue-600 bg-white text-blue-600"
+                              : "border-gray-300 bg-white text-gray-300"
+                          }`}
             >
-              {step.icon}
+              <step.icon
+                className={`w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 ${
+                  step.completed ? "text-blue-600" : "text-gray-400"
+                }`}
+              />
             </div>
           </div>
         ))}
       </div>
 
       {/* Label Step */}
-      <div className="flex w-full justify-between mt-4">
+      <div className="flex w-full justify-around mt-4 text-xs md:text-sm text-center">
         {steps.map((step) => (
-          <span key={step.id} className="text-[7px] sm:text-base md:text-xs lg:text-sm text-center w-1/4">
-            {step.label}
-          </span>
+          <span key={step.id} className="w-1/4">{step.label}</span>
         ))}
       </div>
     </div>
