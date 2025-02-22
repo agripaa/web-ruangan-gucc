@@ -17,7 +17,7 @@ const ProgressBar = ({ currentStep }) => {
   return (
     <div className="relative flex flex-col items-center w-full max-w-4xl mx-auto mt-12 px-4">
       {/* Progress Line - Dibagi berdasarkan jumlah step */}
-      <div className="absolute top-[50%] transform -translate-y-1/2 w-full sm:w-4/5 md:w-3/4 h-2 flex">
+      <div className="absolute top-5 sm:top-8 lg:top-1/3 transform -translate-y-1/2 w-[80%] sm:w-[50%] md:w-[75%] h-1 flex">
         {steps.map((step, index) => {
           if (index === steps.length - 1) return null; // Tidak ada garis setelah step terakhir
           return (
@@ -37,7 +37,7 @@ const ProgressBar = ({ currentStep }) => {
           <div key={step.id} className="relative flex flex-col items-center w-1/4">
             <div
               className={`relative flex items-center justify-center 
-                          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full border-4 text-lg
+                          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-19 lg:h-19 rounded-full border-4 text-lg
                           ${
                             step.completed
                               ? "border-blue-600 bg-white text-blue-600"
@@ -45,7 +45,7 @@ const ProgressBar = ({ currentStep }) => {
                           }`}
             >
               <step.icon
-                className={`w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 ${
+                className={`w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-8 lg:h-8 ${
                   step.completed ? "text-blue-600" : "text-gray-400"
                 }`}
               />
@@ -55,7 +55,7 @@ const ProgressBar = ({ currentStep }) => {
       </div>
 
       {/* Label Step */}
-      <div className="flex w-full justify-around mt-4 text-xs md:text-sm text-center">
+      <div className="flex w-full justify-around mt-4 text-[7px] md:text-sm lg:text-md text-center">
         {steps.map((step) => (
           <span key={step.id} className="w-1/4">{step.label}</span>
         ))}

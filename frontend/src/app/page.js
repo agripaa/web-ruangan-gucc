@@ -6,8 +6,10 @@ import Search from '@/assets/Search.png';
 import Plus from '@/assets/Plus.png';
 import Back from '@/assets/Back.png';
 import Time from '@/assets/time.png';
+import notrack from '@/assets/no-tracks.png';
 import React, { useEffect, useState } from "react";
 import ProgressBar from "@/components/progressBar";
+import RoomStatus from "@/components/roomStatus";
 import { getCampuses } from "@/services/campus";
 import { getAllReport, createReport, getReportByToken } from "@/services/reports";
 
@@ -18,6 +20,7 @@ export default function Home() {
   const [reportToken, setReportToken] = useState(null);
   const [progressStep, setProgressStep] = useState(0);
   const [searchToken, setSearchToken] = useState("");
+  const [statusProgress, setStatusProgress] = useState(0)
 
   const statusMapping = {
     pending: 1,
@@ -213,7 +216,15 @@ export default function Home() {
         )}
       </section>
       
-      <ProgressBar currentStep={progressStep} />
+      <div className="progress-container flex justify-center items-center my-10">
+        {progressStep !== 0 ? (
+          <ProgressBar currentStep={progressStep} />
+        ) : (
+          <div className="no-tracking justify-center">
+            <Image src={notrack} alt="Tidak ada pencarian" width={200} height={200} />
+          </div>
+        )}
+      </div>
 
       <div className="history">
         <h1>Riwayat Pengaduan</h1>
@@ -224,15 +235,14 @@ export default function Home() {
                 <div className="room-detail">
                   <h1>Ruangan: {report.room}</h1>
                   <div className="room-status">
-                    <Image src={Time} className="time-icon" width={13} height={13} alt="Dalam Proses"/>
-                    <p>{report.status}</p>
+                  <RoomStatus initialStatus = {report.status}/>
                   </div>
                 </div>
                 <div className="room-token">
                   <h2>Nomor Pengaduan: {report.token}</h2>
                 </div>    
               </div>
-              <h2>{new Date(report.updated_at).toLocaleDateString()}</h2>
+              <h2 className="room-date">{new Date(report.updated_at).toLocaleDateString()}</h2>
             </div>
           ))}
         </div>

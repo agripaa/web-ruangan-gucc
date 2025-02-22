@@ -2,15 +2,7 @@
     display: flexbox;
     height: 100vh;
     margin: 0;
-    padding: 2rem 3rem;
-}
-
-.form-location select {
-    margin-top: 7px;
-    padding: 8px 25px;
-    border-radius: 25px;
-    border: 1px solid #DEDEDE;
-    font-size: 12px;
+    padding: 4rem 5rem;
 }
 
 .title-logo {
@@ -22,19 +14,19 @@
 }
 
 .title-logo p {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 400;
 }
 
 .welcome h1 {
     font-weight: 500;
-    font-size: 35px;
+    font-size: 40px;
     margin-bottom: 5px;
 }
 
 .welcome p {
     color: #838383;
-    font-size: 12px;
+    font-size: 18px;
 }
 
 .search-container {
@@ -44,6 +36,10 @@
     flex-wrap: wrap; /* Agar tetap rapi di layar kecil */
     margin-top: 3rem;
     font-weight: 600;
+}
+
+.search-title, .history h1 {
+    font-size: 20px;
 }
 
 .search-create {
@@ -57,12 +53,16 @@
     flex-direction: row;
 }
 
+.search-create .search-input input {
+    font-size: 12px;
+}
+
+
 .search-input {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    font-size: 10px;
     font-weight: 400;
     margin-inline-end: 7px;
     border: 1px solid #00000031;
@@ -80,7 +80,7 @@
 }
 
 .search-bar button {
-    font-size: 12px;
+    font-size: 15px;
     color: #fff;
     background-color: #3C64FF;
     border-radius: 25px;
@@ -89,7 +89,7 @@
 
 
 .form-create {
-    font-size: 12px;
+    font-size: 15px;
     color: #3C64FF;
     display: flex;
     flex-direction: row;
@@ -141,13 +141,14 @@
     padding-block: 10px;
     align-items: center;
     font-weight: 500;
+    font-size: 20px;
 }
 
 .form-name, .form-phone {
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
-    font-size: 13px;
+    font-size: 16px;
     gap: 10px;
 }
 
@@ -185,7 +186,17 @@ form label {
     width: 45%;
 }
 
-
+.form-location select {
+    margin-top: 7px;
+    width: 110%;
+    border: 1px solid #00000028;
+    border-radius: 25px;
+    padding: 8px 18px;
+    font-size: 12px;
+    outline: none;
+    color: #33363F;
+    font-weight: 400;
+}
 
 .form-room {
     width: 50%;
@@ -284,27 +295,79 @@ form label {
     margin-bottom: 10px;
 }
 
+.room-detail .room-status {
+    background-color: #fff;
+}
+
 .rooms {
     align-items: center;
 }
 
-.room-token {
-    color: #787878;
-}
-
 .rooms h2 {
-    font-size: 10px;
+    font-size: 15px;
     color: #000000;
     font-weight: 300;
     font-style: italic;
 }
 
-/* responsif */
+.room-token h2 {
+    color: #787878;
+    font-size: 15px;
+}
 
-/* Tablet dan Laptop Kecil (≤ 1024px) */
-@media (max-width: 1024px) {
+/* responsif */
+@media (max-width: 1440px) {
     .main-container {
-        padding: 1.5rem;
+        padding: 3rem 5rem;
+    }
+    .main-container .title-logo p{
+        font-size: 15px;
+    }
+
+    .search-title{
+        font-size: 15px;
+    }
+
+    .welcome h1 {
+        font-size: 30px;
+    }
+
+    .welcome p{
+        font-size: 15px;
+    }
+
+    .search-title {
+        font-size: 20px;
+    }
+
+    .search-input input {
+        font-size: 20px;
+    }
+
+    .history h1 {
+        font-size: 20px;
+    }
+}
+/* Tablet dan Laptop Kecil (≤ 1024px) */
+@media (max-width: 1028px) {
+    .main-container {
+        padding: 3rem 4rem;
+    }
+
+    .main-container .title-logo p{
+        font-size: 15px;
+    }
+
+    .search-title{
+        font-size: 15px;
+    }
+
+    .welcome h1 {
+        font-size: 30px;
+    }
+
+    .welcome p{
+        font-size: 15px;
     }
 
     .modal {
@@ -313,12 +376,30 @@ form label {
     }
 
     .search-input input {
-        width: 12rem;
+        font-size: 12px;
+    }
+
+    .form-create {
+        font-size: 12px ;
+    }
+
+    .history h1 {
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+
+    .rooms .room-status {
+        margin: 0;
+        padding: 0;
+    }
+
+    .room-token {
+        margin-top: 5px;
     }
 }
 
 /* Tablet Portrait dan Smartphone Besar (≤ 768px) */
-@media (max-width: 768px) {
+@media (max-width: 770px) {
     .main-container {
         flex-direction: column;
         padding: 3rem;
@@ -337,6 +418,7 @@ form label {
         width: 40%;
         align-self: flex-start;
         margin-bottom: -27px;
+        font-size: 20px;
     }
 
     .search-create {
@@ -348,17 +430,23 @@ form label {
     .search-bar {
         width: 100%;
         justify-content: center;
+        font-size: 25px;
     }
 
     .search-input {
         width: 90%;
-        justify-content: center;
+        justify-content: left;
+        font-size: 12px;
+    }
+
+    .search-bar button {
+        font-size: 10px;
     }
 
     .form-create {
         width: 30%;
         justify-content: center;
-        font-size: 10px;
+        font-size: 12px;
         order: -1;
         align-self: flex-end;
     }
@@ -391,6 +479,10 @@ form label {
         width: 100%;
     }
 
+    .form-location select {
+        width: 100%;
+    }
+
     .modal-footer {
         flex-direction: column;;
     }
@@ -409,6 +501,19 @@ form label {
         width: 80%;
         font-size: 8px;
         margin-top: 10px;
+    }
+
+    .history h1 {
+        font-size: 20px;
+    }
+
+    .rooms .room-status {
+        margin: 0;
+        padding: 0;
+    }
+
+    .room-token {
+        margin-top: 5px;
     }
 }
 /* Smartphone Kecil (≤ 480px) */
@@ -429,7 +534,7 @@ form label {
     }
 
     .title-logo p {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .search-container {
@@ -441,11 +546,17 @@ form label {
         align-self: self-start;
         z-index: 1;
         margin-bottom: -22px;
+        font-size: 15px;
     }
 
     .search-input {
         padding: 0;
         width: 100%;
+        font-size: 10px;
+    }
+
+    .search-input {
+        padding-left: 10px;
     }
 
     .search-icon {
@@ -453,18 +564,13 @@ form label {
         height: 10px;
     }
 
-    .search-input input {
-        font-size: 7px;
-        
-    }
-
     .search-bar button {
-        font-size: 8px;
+        font-size: 10px;
         padding: 5px 10px;
     }
 
     .form-create {
-        font-size: 8px;
+        font-size: 10px;
         padding: 5px 5px;
         width: 35%;
         order: -1;
@@ -490,6 +596,15 @@ form label {
         font-size: 10px;
         margin-top: 10px;
     }
+
+    .form-location select {
+        /* margin-top: 7px; */
+        font-size: 8px;
+        outline: none;
+        padding: 6px 8px;
+        color: #33363f6e;
+        font-weight: 200;
+        }
 
     form input,
     .desc textarea {
@@ -518,6 +633,7 @@ form label {
     }
 
     .submit p{
+        font-size: 8.5px;
         width: 100%;
     }
 
@@ -526,6 +642,9 @@ form label {
         margin-top: 35px;
     }
 
+    .history h1 {
+        font-size: 15px;
+    }
     .room-histories {
         max-height: 400px;
         /* background-color: rgb(240, 117, 117); */
@@ -537,8 +656,15 @@ form label {
         font-size: 10px;
     }
 
+    .room-detail h1 {
+        font-size: 12px;
+    }
+
+    .rooms .room-date {
+        font-size: 10px;
+    }
+
     .room-detail .room-status {
-        padding: 3px;
         align-items: center;
     }
 
@@ -559,13 +685,36 @@ form label {
 }
 
 
-@media (max-width: 325px){
+@media (max-width: 380px){
     .search-container {
+        font-size: 5px;
+    }
+
+    .search-title {
+        font-size: 12px;
+        margin-bottom: -20px;
+    }
+
+    .history h1{
+        font-size: 12px;
+    }
+
+    .search-create .search-input input {
         font-size: 8px;
     }
 
     .form-create {
-        width: 40%;
-        font-size: 6px;
+        width: 35%;
+        font-size: 8px;
+        padding: 2px;
+    }
+
+    .search-bar button {
+        font-size: 8px;
+        
+    }
+
+    .rooms .room-date {
+        font-size: 7px;
     }
 }
