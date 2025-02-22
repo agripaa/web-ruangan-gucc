@@ -1,14 +1,48 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { getProfile } from '@/services/user';
 import LogoGUCC from '@/assets/Logo GUCC.png';
 import { FaHome, FaClock, FaFolder, FaUser } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6"; 
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const [tokenChecked, setTokenChecked] = useState(false);
+  const [tokenValid, setTokenValid] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await getProfile(); // Jika token valid
+        setTokenValid(true);
+      } catch (error) {
+        localStorage.removeItem("token");
+        setTokenValid(false);
+      } finally {
+        setTokenChecked(true); // Tandai bahwa pengecekan selesai
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (tokenChecked && !tokenValid) {
+      router.push("/login");
+    }
+  }, [tokenChecked, tokenValid, router]);
+
+  if (!tokenChecked) {
+    return null; // Jangan render apapun sebelum pengecekan selesai
+  }
+
+  if (!tokenValid) {
+    return null; // Jangan render Sidebar jika token tidak valid
+  }
 
   const navItems = [
     { name: "Home", href: "/admin", icon: <FaHome /> },

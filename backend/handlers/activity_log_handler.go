@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +11,28 @@ import (
 func GetActivityLogs(c *fiber.Ctx) error {
 	var logs []models.ActivityLog
 	config.DB.Preload("User").Preload("Report").Find(&logs)
+	return c.JSON(logs)
+}
+
+func GetCreateReportLogs(c *fiber.Ctx) error {
+	var logs []models.ActivityLog
+	config.DB.Preload("User").Preload("Report").
+		Where("type_log = ?", "create report").
+		Order("timestamp DESC").
+		Limit(15).
+		Find(&logs)
+
+	return c.JSON(logs)
+}
+
+func GetUpdateReportLogs(c *fiber.Ctx) error {
+	var logs []models.ActivityLog
+	config.DB.Preload("User").Preload("Report").
+		Where("type_log = ?", "update report").
+		Order("timestamp DESC").
+		Limit(15).
+		Find(&logs)
+
 	return c.JSON(logs)
 }
 
@@ -24,18 +47,30 @@ func GetActivityLogByID(c *fiber.Ctx) error {
 }
 
 func CreateActivityLog(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
-
 	var log models.ActivityLog
+
+	// Ambil user_id dari context dengan type assertion
+	userID, ok := c.Locals("user_id").(uint)
+
+	// Parse request body ke struct
 	if err := c.BodyParser(&log); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	log.UserID = &userID
+	// Jika userID tidak tersedia, set ke nil untuk menghindari foreign key error
+	if ok {
+		log.UserID = &userID
+	} else {
+		log.UserID = nil // Pastikan nil agar tidak memicu error FK
+	}
 
+	// Set timestamp
+	log.Timestamp = time.Now().UTC()
+
+	// Simpan log ke database
 	result := config.DB.Create(&log)
 	if result.Error != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity log"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity log", "details": result.Error.Error()})
 	}
 
 	return c.Status(201).JSON(log)

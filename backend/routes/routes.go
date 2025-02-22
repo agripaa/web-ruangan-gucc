@@ -10,8 +10,14 @@ import (
 func SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
+	api.Get("/campuses", handlers.GetCampuses)
+
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
+
+	api.Post("/logs", handlers.CreateActivityLog)
+	api.Get("/create-report", handlers.GetCreateReportLogs)
+	api.Get("/update-report", handlers.GetUpdateReportLogs)
 
 	// Public access reports
 	reports := api.Group("/reports")
@@ -26,9 +32,11 @@ func SetupRoutes(app *fiber.App) {
 	user.Get("/profile", handlers.GetProfile)
 
 	adminReports := admin.Group("/reports")
+	adminReports.Get("/status/count", handlers.GetReportStatusCounts)
 	adminReports.Get("/:id", handlers.GetReportByID)
 	adminReports.Get("/paginate/datum", handlers.GetReportPagination)
 	adminReports.Put("/:id", handlers.UpdateReport)
+	adminReports.Put("/:id/status", handlers.UpdateReportStatus)
 	adminReports.Delete("/:id", handlers.DeleteReport)
 	adminReports.Get("/export/pdf", handlers.ExportReportsToPDF)
 	adminReports.Get("/export/excel", handlers.ExportReportsToExcel)
@@ -36,12 +44,11 @@ func SetupRoutes(app *fiber.App) {
 	activityLogs := admin.Group("/activity-logs")
 	activityLogs.Get("/", handlers.GetActivityLogs)
 	activityLogs.Get("/:id", handlers.GetActivityLogByID)
-	activityLogs.Post("/", handlers.CreateActivityLog)
 	activityLogs.Put("/:id", handlers.UpdateActivityLog)
 	activityLogs.Delete("/:id", handlers.DeleteActivityLog)
 
 	campus := admin.Group("/campus")
-	campus.Get("/", handlers.GetCampuses)
+	campus.Get("/", handlers.GetCampusesPaginate)
 	campus.Get("/:id", handlers.GetCampusByID)
 	campus.Post("/", handlers.CreateCampus)
 	campus.Put("/:id", handlers.UpdateCampus)

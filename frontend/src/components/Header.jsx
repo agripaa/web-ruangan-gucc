@@ -1,14 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getCampuses } from "@/services/campus";
+import { createReport } from "@/services/reports";
+import { logoutUser } from "@/services/auth";
+import { getActivityCreateReportLog, createActivityLog } from "@/services/logs";
 import { FaBell, FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import LogoGunadarma from "@/assets/Universitas Gunadarma.png";
 import Modal from "@/components/Modal";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
-
+  const [campuses, setCampuses] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
     phone_number: "",
@@ -17,58 +25,60 @@ const Header = () => {
     description: "",
   });
 
-  const campuses = [
-    { id: 1, name: "Kampus D - Margonda" },
-    { id: 2, name: "Kampus G - Kelapa Dua" },
-    { id: 3, name: "Kampus A - Kelapa Dua" },
-    { id: 4, name: "Kampus B - Kelapa Dua" },
-    { id: 5, name: "Kampus C - Kelapa Dua" },
-  ];
+  useEffect(() => {
+    fetchCampuses();
+    fetchNotifications();
+  }, []);
 
-  const notifications = [
-    {
-      action: "Incoming Report",
-      detail_action: "{username} report room - Kampus D Room (D423)",
-      target_report_id: 59,
-      Report: {
-        ID: 59,
-        token: "TOKEN123",
-        username: "testuser",
-        phone_number: "123456789",
-        room: "D423",
-        campus_id: 1,
-        status: "pending",
-        description: "AC rusak di kelas, tidak bisa dinyalakan lebih dari 1 jam...",
-        reported_at: "2025-02-20T01:49:38.304186Z",
-      },
-    },
-    {
-      action: "Incoming Report",
-      detail_action: "{username} report room - Kampus G Room (D120)",
-      target_report_id: 60,
-      Report: {
-        ID: 60,
-        token: "TOKEN456",
-        username: "john_doe",
-        phone_number: "987654321",
-        room: "D120",
-        campus_id: 2,
-        status: "pending",
-        description: "Lampu mati total sejak pagi...",
-        reported_at: "2025-02-20T02:30:10.304186Z",
-      },
-    },
-  ];
-
-  // Handle form input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Ambil data kampus dari API
+  const fetchCampuses = async () => {
+    try {
+      const data = await getCampuses();
+      setCampuses(data || []);
+    } catch (error) {
+      return error
+    }
   };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    console.log("Submitting Report:", formData);
-    setIsReportModalOpen(false);
+  const fetchNotifications = async () => {
+    try {
+      const logs = await getActivityCreateReportLog();
+      setNotifications(logs || []);
+    } catch (error) {
+      return error
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "campus_id" ? parseInt(value, 10) || "" : value, 
+    });
+  };
+
+  // Handle submit pengaduan
+  const handleSubmit = async () => {
+    try {
+      const new_report = await createReport(formData);
+      await createActivityLog({
+        type_log: "create report",
+        action: `${formData.username} Create Report`,
+        detail_action: `Report Room: ${formData.room} => ${formData.description}`,
+        target_report_id: new_report.ID,
+        user_id: null,
+      })
+      Swal.fire("Success", "Report submitted successfully!", "success");
+      setIsReportModalOpen(false);
+    } catch (error) {
+      Swal.fire("Error", "Failed to submit report!", "error");
+    }
+  };
+
+  // Fungsi logout
+  const handleLogout = () => {
+    logoutUser();
+    router.push("/login"); // Redirect ke halaman login setelah logout
   };
 
   return (
@@ -93,7 +103,10 @@ const Header = () => {
               )}
             </div>
 
-            <button className="text-white bg-red-600 cursor-pointer hover:bg-red-800 py-2 px-4 font-semibold rounded-xl">
+            <button 
+              className="text-white bg-red-600 cursor-pointer hover:bg-red-800 py-2 px-4 font-semibold rounded-xl"
+              onClick={() => handleLogout()}
+            >
               Logout
             </button>
           </div>
@@ -121,7 +134,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Modal for Creating a Report */}
       <Modal
         isOpen={isReportModalOpen}
         title="Buat Pengaduan"
@@ -129,7 +141,7 @@ const Header = () => {
         onSubmit={handleSubmit}
         submitText="Submit"
       >
-<div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {/* Username */}
           <div>
             <label className="block text-gray-700">Username</label>
@@ -168,8 +180,8 @@ const Header = () => {
             >
               <option value="">Select Campus</option>
               {campuses.map((campus) => (
-                <option key={campus.id} value={campus.id}>
-                  {campus.name}
+                <option key={campus.ID} value={campus.ID}>
+                  {campus.CampusName} - {campus.CampusLocation}
                 </option>
               ))}
             </select>
@@ -203,7 +215,6 @@ const Header = () => {
         </div>
       </Modal>
 
-      {/* Modal for Notifications */}
       <Modal
         isOpen={isNotifModalOpen}
         title="Incoming Reports"
@@ -216,16 +227,22 @@ const Header = () => {
             notifications.map((notif, index) => (
               <div key={index} className="p-3 border-b last:border-none">
                 <p className="text-gray-600 text-sm">
-                  {new Date(notif.Report.reported_at).toLocaleDateString("id-ID")}
+                  {notif.timestamp && new Date(notif.timestamp).toString() !== "Invalid Date"
+                    ? new Date(notif.timestamp).toLocaleDateString("id-ID", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
+                    : "No Date Available"}
                 </p>
-                <p className="font-semibold">{notif.Report.username}</p>
+                <p className="font-semibold">{notif.action || "No Action Data"}</p>
                 <p className="text-gray-700">
-                  Campus: Kampus {notif.Report.campus_id} - Room {notif.Report.room}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {notif.Report.description.length > 50
-                    ? notif.Report.description.substring(0, 50) + "..."
-                    : notif.Report.description}
+                  {notif.Report
+                    ? notif.detail_action
+                    : "No report data available"}
                 </p>
               </div>
             ))
