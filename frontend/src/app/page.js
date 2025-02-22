@@ -7,11 +7,26 @@ import Plus from '@/assets/Plus.png';
 import Back from '@/assets/Back.png';
 import Arrow from '@/assets/room-arrow.png';
 import Time from '@/assets/time.png';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "@/components/progressBar";
+import { getAllReport } from "../services/report";
 
 export default function Home() {
+  const [reports, setReports] = useState([]);
+
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    async function fetchReports() {
+      try {
+        const data = await getAllReport();
+        setReports(data);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      }
+    }
+    fetchReports();
+  }, []);
+
   return (
     <div className="main-container">
       <div className="title-logo">
@@ -23,6 +38,11 @@ export default function Home() {
         <div className="welcome">
           <h1>Selamat Siang!</h1>
           <p>Kami siap membantu kapan saja dan dimana saja!</p>
+          {reports.map((report) => (
+          <li key={report.id}>
+            <strong>Token:</strong> {report.token} - <strong>Status:</strong> {report.status}
+          </li>
+        ))}
         </div>
 
         <div className="search-container">
@@ -53,18 +73,18 @@ export default function Home() {
           </div>
           <form>
             <div className="form-name">
-              <label for="name">Nama lengkap *</label>
+              <label >Nama lengkap *</label>
               <input type="text" placeholder="Full name"></input>
             </div>
 
             <div className="form-phone">
-              <label for="phone">Nomor telepon *</label>
+              <label >Nomor telepon *</label>
               <input type="text" placeholder="Phone number"></input>
             </div>
 
             <div className="location-container">
               <div className="form-location">
-                <label for="kampus">Kampus *</label>
+                <label>Kampus *</label>
                 <input list="location" id="kampus" name="kampus" placeholder="Masukkan Kampus"></input>
                 <datalist id="location">
                   <option value="Kampus D Margonda"></option>
@@ -76,7 +96,7 @@ export default function Home() {
               </div>
 
               <div className="form-room">
-                <label for="room">Ruangan *
+                <label>Ruangan *
                 <Image src={Arrow} className="arrow-icon" width={10} height={10} alt=""/>
                 </label>
                 <input type="text" placeholder="Job location"></input>
@@ -84,7 +104,7 @@ export default function Home() {
             </div>
 
             <div className="desc">
-              <label for="description">Deskripsi *</label>
+              <label>Deskripsi *</label>
               <textarea placeholder="Type here"></textarea>
             </div>
 
