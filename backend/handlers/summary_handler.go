@@ -3,18 +3,18 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
-	"log"
-	"fmt"
 	"database/sql"
 	"errors"
+	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type SummaryRequest struct {
-	AdminID uint   `json:"admin_id"`
-	Summary string `json:"summary"`
+	WorkerID uint   `json:"admin_id"`
+	Summary  string `json:"summary"`
 }
 
 func SaveReportSummary(c *fiber.Ctx) error {
@@ -28,7 +28,7 @@ func SaveReportSummary(c *fiber.Ctx) error {
 
 	// Parse request body dengan error handling yang benar
 	var req SummaryRequest
-	if err := c.BodyParser(&req); err != nil { 
+	if err := c.BodyParser(&req); err != nil {
 		log.Println("Error parsing request body:", err)
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
@@ -47,7 +47,7 @@ func SaveReportSummary(c *fiber.Ctx) error {
 	if result.RowsAffected > 0 {
 		// Jika summary sudah ada, lakukan update
 		existingSummary.Summary = req.Summary
-		existingSummary.AdminID = uint(req.AdminID)
+		existingSummary.WorkerID = uint(req.WorkerID)
 		if err := config.DB.Save(&existingSummary).Error; err != nil {
 			log.Println("Error updating summary:", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update summary"})
@@ -55,8 +55,8 @@ func SaveReportSummary(c *fiber.Ctx) error {
 	} else {
 		// Jika belum ada, lakukan insert
 		newSummary := models.Summary{
-			ReportID: uint(reportID), 
-			AdminID:  uint(req.AdminID),
+			ReportID: uint(reportID),
+			WorkerID: uint(req.WorkerID),
 			Summary:  req.Summary,
 		}
 		fmt.Println("Inserting new summary:", newSummary)
@@ -94,7 +94,6 @@ func GetReportSummary(c *fiber.Ctx) error {
 
 	var savedSummary models.Summary
 	config.DB.Table("report_summaries").Where("report_id = ?", uint(reportID)).First(&savedSummary)
-
 
 	return c.JSON(summary)
 }
