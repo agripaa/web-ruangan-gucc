@@ -113,12 +113,13 @@ const LaporanMasuk = () => {
       "in progress": { next: "done", buttonText: "Selesai" },
     };
 
+    const currentStatus = report.status;
+    const nextStatus = statusFlow[currentStatus]?.next;
+
     if (currentStatus === "done") {
       // Jika status sudah "done", buka modal ringkasan
       openSummaryModal(report);
     }
-    const currentStatus = report.status;
-    const nextStatus = statusFlow[currentStatus]?.next;
     // const nextStatus = newStatus || "done";
 
     if (!nextStatus) {
@@ -259,7 +260,7 @@ const LaporanMasuk = () => {
                   "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
                   "done": { 
                     buttonText: "Summary", 
-                    color: "bg-green-500",
+                    color: "bg-red-500",
                     onClick: (report) => {
                         console.log("Summary button clicked!");
                         // Bisa panggil modal atau fungsi lain
