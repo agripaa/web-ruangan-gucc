@@ -7,7 +7,7 @@ import Plus from '@/assets/Plus.png';
 import Back from '@/assets/Back.png';
 import Time from '@/assets/time.png';
 import notrack from '@/assets/no-tracks.png';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import ProgressBar from "@/components/progressBar";
 import RoomStatus from "@/components/roomStatus";
 import { getCampuses } from "@/services/campus";
@@ -41,16 +41,17 @@ export default function Home() {
     description: "",
   });
 
-  useEffect(() => {
-    async function fetchReports() {
-      try {
-        const data = await getAllReport();
-        console.log("Data terbaru dari API:", data);
-        setReports([...data]);
-      } catch (error) {
-        console.error("Error fetching reports:", error);
-      }
+  async function fetchReports() {
+    try {
+      const data = await getAllReport();
+      console.log("Data terbaru dari API:", data);
+      setReports([...data]);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
     }
+  }
+
+  useEffect(() => {
 
     fetchCampuses();
     fetchReports();
@@ -116,48 +117,11 @@ export default function Home() {
         description: "",
       });
 
-      // Refresh riwayat laporan
-      const data = await getAllReport();
-      setReports(data);
+      fetchReports();
     } catch (error) {
       alert("Gagal mengirim laporan!");
       console.error("Error creating report:", error);
     }
-
-    const reportsReducer = (state, action) => {
-      switch (action.type) {
-        case "SET_REPORTS":
-          return [...action.payload]; // Paksa perubahan state
-        default:
-          return state;
-      }
-    };
-    
-    const [reports, dispatch] = useReducer(reportsReducer, []);
-    
-
-    const refreshReports = async () => {
-      const data = await getAllReport();
-      console.log("🔹 Data terbaru dari API:", data);
-      setReports([...data]); // Paksa perubahan state
-      setForceRender(forceRender + 1); // Paksa re-render
-    };
-
-    useEffect(() => {
-      refreshReports();
-    }, [forceRender]);
-    
-    const getAllReport = async () => {
-      const response = await fetch(`/api/reports?timestamp=${new Date().getTime()}`, {
-        cache: "no-store",
-      });
-      return response.json();
-    };
-    
-
-    useEffect(() => {
-  console.log("🔄 State reports diperbarui:", reports);
-}, [reports]);
   };  
 
   

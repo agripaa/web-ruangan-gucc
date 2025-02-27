@@ -73,8 +73,15 @@ const LaporanMasuk = () => {
     setSelectedReport(report)
     setSelectedReportId(report.ID);
     try {
-      const response = await getReportSummary(report.ID);
-      setSummary(response.summary || "");
+      const response = await saveReportSummary(report.ID);
+      const responses = await getReportSummary(report.ID);
+      
+      if (report.status === "in progress") {
+        setSummary(response.summary || "");
+    } else if (report.status === "done") {
+        setSummary(responses.summary || "");
+    }
+    
     } catch (error) {
       setSummary("");
     }
@@ -106,6 +113,10 @@ const LaporanMasuk = () => {
       "in progress": { next: "done", buttonText: "Selesai" },
     };
 
+    if (currentStatus === "done") {
+      // Jika status sudah "done", buka modal ringkasan
+      openSummaryModal(report);
+    }
     const currentStatus = report.status;
     const nextStatus = statusFlow[currentStatus]?.next;
     // const nextStatus = newStatus || "done";
@@ -246,7 +257,15 @@ const LaporanMasuk = () => {
                   pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
                   "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
-                  done: { text: "Summary", color: "bg-white-300", disabled: true },
+                  "done": { 
+                    buttonText: "Summary", 
+                    color: "bg-green-500",
+                    onClick: (report) => {
+                        console.log("Summary button clicked!");
+                        // Bisa panggil modal atau fungsi lain
+                        openSummaryModal(report);
+                    }
+                },
                 };
                 const statusData = statusFlow[report.status] || { text: "Unknown", color: "bg-white-500", disabled: true };
                 return (
@@ -264,7 +283,7 @@ const LaporanMasuk = () => {
                       Detail
                     </button>
 
-                    {report.status !== "done" ? (
+                    {report.status !== "in progress" ? (
                       <button
                         onClick={() => handleStatusUpdate(report)}
                         className={`${statusFlow[report.status]?.color} text-white px-3 py-1 rounded-md`}
@@ -274,11 +293,12 @@ const LaporanMasuk = () => {
                     ) : (
                       <button
                         onClick={() => openSummaryModal(report)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                        className="bg-green-500 text-white px-3 py-1 rounded-md"
                       >
-                        Summary
+                        Selesai
                       </button>
                     )}
+
 
                   </td>
                 </tr>
