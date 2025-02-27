@@ -3,6 +3,7 @@ package routes
 import (
 	"backend/handlers"
 	"backend/middlewares"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,12 +19,21 @@ func SetupRoutes(app *fiber.App) {
 	api.Post("/logs", handlers.CreateActivityLog)
 	api.Get("/create-report", handlers.GetCreateReportLogs)
 	api.Get("/update-report", handlers.GetUpdateReportLogs)
+	api.Post("/summary", handlers.SaveReportSummary)
+	api.Get("/summary", handlers.GetReportSummary)
 
 	// Public access reports
 	reports := api.Group("/reports")
 	reports.Get("/", handlers.GetReports)
 	reports.Get("/search", handlers.SearchReportByToken)
 	reports.Post("/", handlers.CreateReport)
+
+	summary := api.Group("/summary")
+	summary.Post("/:reportId", func(c *fiber.Ctx) error {
+		fmt.Println("POST request masuk ke /summary/:reportId")
+		return handlers.SaveReportSummary(c)
+	})
+	summary.Get("/:reportId", handlers.GetReportSummary)
 
 	// Admin access requires authentication
 	admin := api.Group("/admin", middlewares.AuthMiddleware)
@@ -54,4 +64,8 @@ func SetupRoutes(app *fiber.App) {
 	campus.Put("/:id", handlers.UpdateCampus)
 	campus.Patch("/:id", handlers.UpdateCampus)
 	campus.Delete("/:id", handlers.DeleteCampus)
+
+	adminSummary := admin.Group("/summary")
+	adminSummary.Post("/:reportId", handlers.SaveReportSummary)
+	adminSummary.Get("/:reportId", handlers.GetReportSummary)
 }

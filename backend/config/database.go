@@ -5,9 +5,12 @@ import (
 	"log"
 	"os"
 
+	"backend/models"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -41,13 +44,24 @@ func ConnectDB() {
 	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		host, user, password, dbname, port)
+	host, user, password, dbname, port)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
 	DB = db
 	fmt.Println("Database connected successfully")
+
+	var test []models.ActivityLog
+	result := DB.Find(&test)
+	if result.Error != nil {
+		fmt.Println("Error fetching activity logs:", result.Error)
+	} else {
+		fmt.Println("Total activity logs:", len(test))
+	}
+
 }

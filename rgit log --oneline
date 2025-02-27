@@ -1,0 +1,58 @@
+[33m230bfe2[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m)[m fix: responsive UI, progress bar, status color and untracked image
+[33maf56e1d[m Fix: Progress bar alignment, responsive icons, and dynamic progress line color
+[33m6dcff1d[m[33m ([m[1;31morigin/feature/report[m[33m)[m feat: add create, read, search for report
+[33md9f8586[m[33m ([m[1;32mupdate/homepage[m[33m)[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into update/homepage
+[33m87facbc[m delete: console log and console error
+[33mf5bbdce[m update: pagination show data campus
+[33ma106ced[m Fix: Redirect user to /login if token is invalid in Sidebar.jsx
+[33mf0600d7[m feature: Implement update report status logging and activity log tracking
+[33mb66d9e2[m Add update report log to dashboard with empty state handling
+[33md79165c[m feature: Add API and UI for report status count in dashboard
+[33mc01f157[m feature: Handle notification log for create report, fix user_id FK constraint issue
+[33m2465405[m update: fix timestamp field & add filters for create & update report logs
+[33mb6ca1f0[m update: set default month and year dynamically using JavaScript Date
+[33m4b50d23[m fix: improve pagination display to limit max pages to 3 and adjust dynamically
+[33mcf1d6b9[m update: - Initial setup for laporan masuk page - Implement pagination and sorting for laporan masuk - Integrate API for fetching reports with month and year filter - Fix worker-user relation in reports API - Add report export feature for PDF and Excel - Fix date range issue in reports export - Enhance UI for report list with sorting and filtering - Implement download functionality for reports with selected period
+[33m7c205ef[m update: Add worker-user relation, API updates, date sorting, and status transitions
+[33mdf8ed77[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into update/homepage
+[33m01d5dc3[m fix: improve JWT auth and profile fetching
+[33m4e45f34[m fix: resolve network error in API consumption
+[33mc67a7ca[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into update/homepage
+[33m4459e57[m[33m ([m[1;31morigin/update/homepage[m[33m)[m update: Improve UI for homepage - form modal, tracking, and history
+[33mdb8da9e[m fix: add pagination to campus list
+[33m85afdac[m update: enhance modals for notifications & report creation
+[33m6d49d13[m feat: add CRUD functionality for campus management with modals and delete confirmation
+[33md93a34a[m update: icon size in sidebar
+[33mbc0827c[m feat: add responsive login page with password visibility toggle
+[33mc7c7904[m feat: highlight active route in sidebar with dynamic styling
+[33me84394a[m feat: add dashboard with activity log & report status chart
+[33m0ea1f3c[m feat: add profile page with user info and default profile icon
+[33m2c403e0[m feat: add download buttons for Excel and PDF in laporan page
+[33m3fcc77d[m feat: add laporan masuk page with sidebar and header
+[33m78d5bc0[m[33m ([m[1;32mfeature/campus-crud[m[33m)[m update: Add PDF and Excel export for reports
+[33m3ee4ebc[m update: Add user profile API with JWT authentication
+[33m45ae780[m update: change structure json data for request and response in models
+[33m1ba0400[m update: Improve unit tests for reports - pagination validation, token search, and activity log integration
+[33m2f20cad[m merge: Merge branch 'feature/campus-crud' of github.com:agripaa/web-ruangan-gucc into update/reports-crud
+[33m9bf2166[m update: get all data changed to - get all report => limited get 15 data and show up2date data report - get by token data - get pagination data => default limit in 10 data page 1 - update endpoint for public and admin
+[33m5e65ab1[m[33m ([m[1;31morigin/feature/campus-crud[m[33m)[m feat(campus): add CRUD for Campus model
+[33m9711ccf[m update: migration table data field
+[33m134e35a[m[33m ([m[1;32mfeature/homepage[m[33m)[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into feature/homepage
+[33m98eb5b5[m update: migration data campus
+[33m10411eb[m update: field table data room field
+[33m227d771[m[33m ([m[1;31morigin/feature/homepage[m[33m)[m feat: add UI for homepage with forms
+[33mc3db8da[m[33m ([m[1;32mfeature/dashboard-page[m[33m)[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into feature/dashboard-page
+[33m831f576[m test(activity-log): add CRUD tests for Activity Log model
+[33m3bd2f83[m feat(activity-log): use JWT token to set User ID in activity logs
+[33m61c1680[m test(report): add CRUD tests for Report model
+[33mcb5dd3b[m test(room): add CRUD tests for Room model
+[33m3a6c74c[m Merge branch 'dev' of https://github.com/agripaa/web-ruangan-gucc into feature/dashboard-page
+[33m6c28556[m feat(room): add CRUD for Room model
+[33ma0395bf[m feature: adding crud for report room have conflict in room data table is not found
+[33m6ec61d9[m[33m ([m[1;31morigin/feature/dashboard-page[m[33m)[m feature: add feature dashboard page
+[33m2f983c3[m chore: add .gitignore and .env.example
+[33m9c5c74d[m fixing: auth middleware and add unit test for user
+[33m3683a2a[m feat(auth): add JWT-based authentication system & middleware for route protection
+[33m21d382b[m feat(db): create database schema and migrations
+[33mfdd5176[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m fix: add frontend as a normal directory
+[33mb1f3652[m build: initialisation frontend (Next JS14) backend (golang)

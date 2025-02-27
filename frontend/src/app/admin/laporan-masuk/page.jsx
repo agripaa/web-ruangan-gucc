@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { getReports, updateReportStatus } from "@/services/reports";
+import { getReportSummary, saveReportSummary } from "@/services/summary";
+
 import { createActivityLog } from "@/services/logs";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -26,6 +28,13 @@ const years = ["2025", "2026", "2027"];
 const LaporanMasuk = () => {
   const [reports, setReports] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [summary, setSummary] = useState("")
+
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
 
@@ -50,6 +59,34 @@ const LaporanMasuk = () => {
     }
   };
 
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedReport(null);
+    setIsModalOpen(false);
+  };
+
+  const openSummaryModal = async (report) => {
+    setSelectedReport(report)
+    setSelectedReportId(report.ID);
+    try {
+      const response = await getReportSummary(report.ID);
+      setSummary(response.summary || "");
+    } catch (error) {
+      setSummary("");
+    }
+    setIsSummaryModalOpen(true);
+  };
+
+  const closeSummaryModal = () => {
+    setSelectedReport(null);
+    setSummary("");
+    setIsSummaryModalOpen(false);
+  };
+
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -58,7 +95,11 @@ const LaporanMasuk = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleStatusUpdate = async (report) => {
+  
+
+  const handleStatusUpdate = async (report, newStatus = null) => {
+    if (!report) return;
+
     const statusFlow = {
       pending: { next: "on the way", buttonText: "Ambil" },
       "on the way": { next: "in progress", buttonText: "Progress" },
@@ -67,14 +108,23 @@ const LaporanMasuk = () => {
 
     const currentStatus = report.status;
     const nextStatus = statusFlow[currentStatus]?.next;
-    const buttonText = statusFlow[currentStatus]?.buttonText;
+    // const nextStatus = newStatus || "done";
 
-    if (!nextStatus) return;
+    if (!nextStatus) {
+      console.warn(`⚠ handleStatusUpdate: No next status found for '${currentStatus}'`);
+    return;
+    }
+    // if (nextStatus === "done") {
+    //   openSummaryModal(report);
+    //   return;
+    // }  
 
     try {
+      console.log(`⏳ Updating status from '${currentStatus}' to '${nextStatus}' for report ID: ${report.ID}`);
       await updateReportStatus(report.ID, nextStatus);
+      console.log(`✅ Status updated to '${nextStatus}' for report ID: ${report.ID}`);
 
-      // Simpan ke dalam activity logs
+      await fetchReports
       await createActivityLog({
         type_log: "update report",
         action: `${report.worker ? report.worker.Username : "Someone"} Update Report`,
@@ -83,13 +133,42 @@ const LaporanMasuk = () => {
         user_id: report.worker ? report.worker.ID : null,
       });
 
-      fetchReports(); // Refresh data setelah update status
-      Swal.fire("Success", `Status changed to ${nextStatus}`, "success");
+
+      Swal.fire("Success", `Status updated to '${nextStatus}'`, "success");
+      await fetchReports(); 
+      closeModal();
     } catch (error) {
-      return error
       Swal.fire("Error", "Failed to update report status!", "error");
+      return error
     }
   };
+
+  const handleSaveSummary = async () => {
+    if (!selectedReportId || !summary.trim()) {
+      Swal.fire("Warning", "Summary cannot be empty!", "warning");
+      return;
+    }
+    console.log("Saving summary:", { reportId: selectedReportId, adminId: 1, summary });
+    try {
+      await saveReportSummary(selectedReportId, 1, summary); // Gunakan admin ID yang sesuai
+    
+      Swal.fire("Success", "Summary saved successfully!", "success");
+      
+      if (selectedReport?.status === "in progress") {
+        console.log("⏳ Updating status to 'done'...");
+        await handleStatusUpdate(selectedReport, "done"); // +
+        
+      }
+  
+      await fetchReports();
+      closeSummaryModal();
+    } catch (error) {
+      console.error("Error saving summary:", error);
+      Swal.fire("Error", "Failed to save summary!", "error");
+    }
+  };
+
+
 
   return (
     <div>
@@ -162,16 +241,14 @@ const LaporanMasuk = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-            {reports?.length > 0 ? (
-              reports.map((report) => {
+          {reports.map((report) => {
                 const statusFlow = {
                   pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
                   "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
+                  done: { text: "Summary", color: "bg-white-300", disabled: true },
                 };
-
-                const statusData = statusFlow[report.status];
-
+                const statusData = statusFlow[report.status] || { text: "Unknown", color: "bg-white-500", disabled: true };
                 return (
                   <tr key={report.ID} className="border-b">
                     <td className="p-3">{report.token}</td>
@@ -179,29 +256,112 @@ const LaporanMasuk = () => {
                     <td className="p-3">{report.worker ? report.worker.Username : "-"}</td>
                     <td className="p-3">{new Date(report.reported_at).toLocaleDateString()}</td>
                     <td className="p-3">{report.status}</td>
-                    <td className="p-3">
-                      {statusData && (
-                        <button
-                          onClick={() => handleStatusUpdate(report)}
-                          className={`${statusData.color} text-white px-3 py-1 rounded-md`}
-                        >
-                          {statusData.buttonText}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="6" className="p-3 text-center text-gray-500">
-                  Tidak ada laporan masuk
-                </td>
-              </tr>
-            )}
+                    <td className="flex p-3 gap-3">
+                    <button
+                      onClick={() => openModal(report)}
+                      className="bg-gray-400 text-white px-3 py-1 rounded-md"
+                    >
+                      Detail
+                    </button>
+
+                    {report.status !== "done" ? (
+                      <button
+                        onClick={() => handleStatusUpdate(report)}
+                        className={`${statusFlow[report.status]?.color} text-white px-3 py-1 rounded-md`}
+                      >
+                        {statusFlow[report.status]?.buttonText}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => openSummaryModal(report)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                      >
+                        Summary
+                      </button>
+                    )}
+
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      {/* MODAL DETAIL */}
+      {isModalOpen && selectedReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">Detail Laporan</h2>
+            <label className="block mt-4 font-semibold">Deskripsi Laporan:</label>
+            <textarea
+              className="w-full h-32 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700"
+              readOnly
+              value={selectedReport.description || "Tidak ada deskripsi tersedia"}
+            ></textarea>
+            <p><strong>Token:</strong> {selectedReport.token}</p>
+            <p><strong>Ruangan:</strong> {selectedReport.room}</p>
+            <p><strong>Teknisi:</strong> {selectedReport.worker ? selectedReport.worker.Username : "-"}</p>
+            <p><strong>Tanggal Laporan:</strong> {new Date(selectedReport.reported_at).toLocaleDateString()}</p>
+            <p><strong>Status:</strong> {selectedReport.status}</p>
+            
+            <div className="flex justify-between">
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
+            >
+              Tutup
+            </button>
+
+            {selectedReport.status === "pending" && (
+                <button
+                  onClick={() => handleStatusUpdate(selectedReport)}
+                  className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md"
+                >
+                  Ambil
+                </button>
+            )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SUMMARY */}
+      {isSummaryModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+      <h2 className="text-xl font-bold mb-4">Summary Report</h2>
+
+      <label className="block mt-4 font-semibold">Summary:</label>
+      <textarea
+        className="w-full h-32 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700"
+        value={summary}
+        onChange={(e) => setSummary(e.target.value)}
+      ></textarea>
+
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={() => setIsSummaryModalOpen(false)}
+          className="bg-red-500 text-white px-4 py-2 rounded-md"
+        >
+          Tutup
+        </button>
+
+        <button
+          onClick={() => {
+            handleSaveSummary(); 
+          }}
+          className="bg-green-500 text-white px-4 py-2 rounded-md"
+        >
+          Simpan
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
+
       {/* Pagination */}
       <div className="flex flex-col items-center mt-4">
         <div className="flex justify-center items-center">

@@ -21,6 +21,7 @@ func main() {
 	models.MigrateActivityLogs(config.DB)
 	models.MigrateCampus(config.DB)
 	models.MigrateRoles(config.DB)
+	models.MigrateSummary(config.DB)
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",

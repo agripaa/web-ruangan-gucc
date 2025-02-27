@@ -22,6 +22,9 @@ export default function Home() {
   const [searchToken, setSearchToken] = useState("");
   const [statusProgress, setStatusProgress] = useState(0)
 
+  const [forceRender, setForceRender] = useState(0);
+  
+
   const statusMapping = {
     pending: 1,
     "on the way": 2,
@@ -42,13 +45,19 @@ export default function Home() {
     async function fetchReports() {
       try {
         const data = await getAllReport();
-        setReports(data);
+        console.log("Data terbaru dari API:", data);
+        setReports([...data]);
       } catch (error) {
         console.error("Error fetching reports:", error);
       }
     }
-    fetchReports();
+
     fetchCampuses();
+    fetchReports();
+    const interval = setInterval(fetchReports, 5000); 
+
+    return () => clearInterval(interval);
+    
   }, []);
 
   const fetchCampuses = async () => {
@@ -114,7 +123,44 @@ export default function Home() {
       alert("Gagal mengirim laporan!");
       console.error("Error creating report:", error);
     }
-  };
+
+    const reportsReducer = (state, action) => {
+      switch (action.type) {
+        case "SET_REPORTS":
+          return [...action.payload]; // Paksa perubahan state
+        default:
+          return state;
+      }
+    };
+    
+    const [reports, dispatch] = useReducer(reportsReducer, []);
+    
+
+    const refreshReports = async () => {
+      const data = await getAllReport();
+      console.log("🔹 Data terbaru dari API:", data);
+      setReports([...data]); // Paksa perubahan state
+      setForceRender(forceRender + 1); // Paksa re-render
+    };
+
+    useEffect(() => {
+      refreshReports();
+    }, [forceRender]);
+    
+    const getAllReport = async () => {
+      const response = await fetch(`/api/reports?timestamp=${new Date().getTime()}`, {
+        cache: "no-store",
+      });
+      return response.json();
+    };
+    
+
+    useEffect(() => {
+  console.log("🔄 State reports diperbarui:", reports);
+}, [reports]);
+  };  
+
+  
 
   return (
     <div className="main-container">
@@ -228,14 +274,15 @@ export default function Home() {
 
       <div className="history">
         <h1>Riwayat Pengaduan</h1>
+        {/* <pre>{JSON.stringify(reports, null, 2)}</pre> */}
         <div className="room-histories">
           {reports.map((report) => (            
-            <div className="rooms" key={report.ID}>
+            <div className="rooms" key={`${report.ID}-${report.updated_at}`}>
               <div className="room-content">
                 <div className="room-detail">
                   <h1>Ruangan: {report.room}</h1>
                   <div className="room-status">
-                  <RoomStatus initialStatus = {report.status}/>
+                  <RoomStatus key={`status-${report.ID}`} initialStatus={report.status}/>
                   </div>
                 </div>
                 <div className="room-token">

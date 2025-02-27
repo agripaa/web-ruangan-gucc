@@ -1,0 +1,5 @@
+[33mcommit 230bfe2b279b57220aeefea4ab0821ccb602b17e[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m)[m
+Author: Rafiputraaa <raafiputraa2@gmail.com>
+Date:   Sun Feb 23 06:02:03 2025 +0700
+
+    fix: responsive UI, progress bar, status color and untracked image
