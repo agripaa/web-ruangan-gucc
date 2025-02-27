@@ -206,11 +206,16 @@ func GetReportPagination(c *fiber.Ctx) error {
 	selectedMonth := c.Query("month", "")
 	selectedYear := c.Query("year", "")
 	searchQuery := c.Query("search", "")
+	statusFilter := c.Query("status", "")
 
 	var reports []models.Report
 	var total int64
 
 	query := config.DB.Preload("Campus").Preload("Worker")
+
+	if statusFilter != "" {
+		query = query.Where("status = ?", statusFilter)
+	}
 
 	if searchQuery != "" {
 		query = query.Joins("LEFT JOIN users ON users.id = reports.worker_id").

@@ -23,6 +23,14 @@ const months = [
   { label: "Desember", value: "12" },
 ];
 
+const statusOptions = [
+  { label: "Semua Status", value: "" },
+  { label: "Pending", value: "pending" },
+  { label: "On The Way", value: "on the way" },
+  { label: "In Progress", value: "in progress" },
+  { label: "Done", value: "done" },
+];
+
 const years = ["2025", "2026", "2027"];
 
 const LaporanMasuk = () => {
@@ -31,6 +39,7 @@ const LaporanMasuk = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
@@ -48,7 +57,7 @@ const LaporanMasuk = () => {
 
   useEffect(() => {
     fetchReports();
-  }, [currentPage, sortConfig, selectedMonth, selectedYear, searchQuery]);
+  }, [currentPage, sortConfig, selectedMonth, selectedYear, searchQuery, selectedStatus]);
 
   const fetchReports = async () => {
     try {
@@ -59,7 +68,8 @@ const LaporanMasuk = () => {
         sortConfig.direction, 
         selectedMonth, 
         selectedYear, 
-        searchQuery 
+        searchQuery,
+        selectedStatus
       );
       setReports(data.data);
       setTotalPages(data.total_pages);
@@ -238,14 +248,26 @@ const LaporanMasuk = () => {
               </select>
             </div>
           </div>
-          <input
-            type="text"
-            placeholder="D"
-            className="border px-4 py-2 rounded-lg"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleSearchKeyPress}
-          />
+          <div className="flex items-center gap-3">
+          <select
+              className="border px-4 py-2 rounded-lg"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="border px-4 py-2 rounded-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 

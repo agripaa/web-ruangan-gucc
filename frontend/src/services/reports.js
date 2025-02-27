@@ -31,11 +31,12 @@ export const getReports = async (
     order = "desc",
     month = "",
     year = "",
-    search = ""
+    search = "",
+    status = ""
 ) => {
     try {
         const response = await api.get("/admin/reports/paginate/datum", {
-            params: { page, limit, sort, order, month, year, search },
+            params: { page, limit, sort, order, month, year, search, status },
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
