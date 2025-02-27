@@ -32,7 +32,7 @@ func generateUniqueToken(length int) string {
 		var count int64
 		config.DB.Model(&models.Report{}).Where("token = ?", token).Count(&count)
 		if count == 0 {
-			break // Token is unique, exit loop
+			break
 		}
 	}
 	return token
@@ -46,39 +46,32 @@ func ExportReportsToPDF(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Month and year parameters are required"})
 	}
 
-	// Konversi bulan dan tahun ke integer
 	monthInt, err := strconv.Atoi(month)
 	yearInt, err := strconv.Atoi(year)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid month or year format"})
 	}
 
-	// Hitung tanggal terakhir bulan tersebut
 	lastDay := getLastDayOfMonth(yearInt, monthInt)
 
-	// Format periode
 	period := fmt.Sprintf("Periode: %s-%s", month, year)
 
-	// Query laporan berdasarkan periode
 	var reports []models.Report
 	startDate := fmt.Sprintf("%s-%02d-01", year, monthInt)
 	endDate := fmt.Sprintf("%s-%02d-%02d", year, monthInt, lastDay)
 
 	config.DB.Preload("Campus").Where("DATE(reported_at) BETWEEN ? AND ?", startDate, endDate).Find(&reports)
 
-	// Mulai pembuatan PDF
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
-	// Tambahkan header laporan
 	pdf.SetFont("Arial", "B", 14)
 	pdf.Cell(190, 10, "Laporan Pengaduan")
 	pdf.Ln(10)
 	pdf.SetFont("Arial", "", 12)
-	pdf.Cell(190, 10, period) // Tambahkan periode
+	pdf.Cell(190, 10, period)
 	pdf.Ln(15)
 
-	// Tambahkan isi laporan
 	pdf.SetFont("Arial", "", 10)
 	for _, report := range reports {
 		pdf.Cell(40, 10, fmt.Sprintf("Username: %s", report.Username))
@@ -93,7 +86,6 @@ func ExportReportsToPDF(c *fiber.Ctx) error {
 		pdf.Ln(10)
 	}
 
-	// Simpan file PDF
 	pdfPath := fmt.Sprintf("reports_%s_%02d.pdf", year, monthInt)
 	err = pdf.OutputFileAndClose(pdfPath)
 	if err != nil {
@@ -103,7 +95,6 @@ func ExportReportsToPDF(c *fiber.Ctx) error {
 	return c.Download(pdfPath)
 }
 
-// 📌 Export Excel dengan filter bulan & tahun
 func ExportReportsToExcel(c *fiber.Ctx) error {
 	month := c.Query("month")
 	year := c.Query("year")
@@ -112,32 +103,26 @@ func ExportReportsToExcel(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Month and year parameters are required"})
 	}
 
-	// Konversi bulan dan tahun ke integer
 	monthInt, err := strconv.Atoi(month)
 	yearInt, err := strconv.Atoi(year)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid month or year format"})
 	}
 
-	// Hitung tanggal terakhir bulan tersebut
 	lastDay := getLastDayOfMonth(yearInt, monthInt)
 
-	// Format periode
 	period := fmt.Sprintf("Periode: %s-%02d", year, monthInt)
 
-	// Query laporan berdasarkan periode
 	var reports []models.Report
 	startDate := fmt.Sprintf("%s-%02d-01", year, monthInt)
 	endDate := fmt.Sprintf("%s-%02d-%02d", year, monthInt, lastDay)
 
 	config.DB.Preload("Campus").Where("DATE(reported_at) BETWEEN ? AND ?", startDate, endDate).Find(&reports)
 
-	// Buat file Excel
 	xlsx := excelize.NewFile()
 	sheet := "Reports"
 	xlsx.SetSheetName("Sheet1", sheet)
 
-	// Tambahkan header
 	xlsx.SetCellValue(sheet, "A1", "Laporan Pengaduan")
 	xlsx.MergeCell(sheet, "A1", "G1")
 	xlsx.SetCellValue(sheet, "A2", period)
@@ -149,7 +134,6 @@ func ExportReportsToExcel(c *fiber.Ctx) error {
 		xlsx.SetCellValue(sheet, fmt.Sprintf("%s3", colLetter), header)
 	}
 
-	// Tambahkan isi laporan
 	for rowIdx, report := range reports {
 		row := rowIdx + 4
 		xlsx.SetCellValue(sheet, fmt.Sprintf("A%d", row), report.Username)
@@ -161,7 +145,6 @@ func ExportReportsToExcel(c *fiber.Ctx) error {
 		xlsx.SetCellValue(sheet, fmt.Sprintf("G%d", row), report.Description)
 	}
 
-	// Simpan file Excel
 	excelPath := fmt.Sprintf("reports_%s_%02d.xlsx", year, monthInt)
 	if err := xlsx.SaveAs(excelPath); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to generate Excel file"})
@@ -222,15 +205,30 @@ func GetReportPagination(c *fiber.Ctx) error {
 
 	selectedMonth := c.Query("month", "")
 	selectedYear := c.Query("year", "")
+	searchQuery := c.Query("search", "")
 
 	var reports []models.Report
 	var total int64
 
 	query := config.DB.Preload("Campus").Preload("Worker")
 
+	if searchQuery != "" {
+		query = query.Joins("LEFT JOIN users ON users.id = reports.worker_id").
+			Where("reports.token LIKE ? OR reports.room LIKE ? OR users.username LIKE ?", "%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
+	}
+
 	if selectedMonth != "" && selectedYear != "" {
 		query = query.Where("EXTRACT(YEAR FROM reported_at) = ? AND EXTRACT(MONTH FROM reported_at) = ?", selectedYear, selectedMonth)
 	}
+
+	query = query.Order(`
+		CASE 
+			WHEN status = 'pending' THEN 1
+			WHEN status = 'on the way' THEN 2
+			WHEN status = 'in progress' THEN 3
+			WHEN status = 'done' THEN 4
+		END ASC
+	`)
 
 	if order == "asc" {
 		query = query.Order(fmt.Sprintf("%s ASC", sortBy))
@@ -305,7 +303,6 @@ func UpdateReportStatus(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "Report not found"})
 	}
 
-	// Ambil data dari request body
 	type UpdateStatusRequest struct {
 		Status string `json:"status"`
 	}
@@ -314,13 +311,12 @@ func UpdateReportStatus(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	// Pastikan status valid
 	switch req.Status {
 	case "on the way":
 		if report.Status != "pending" {
 			return c.Status(400).JSON(fiber.Map{"error": "Report must be pending to be assigned"})
 		}
-		// Ambil user_id dari token yang sudah di-authenticate
+
 		userID, ok := c.Locals("user_id").(uint)
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
