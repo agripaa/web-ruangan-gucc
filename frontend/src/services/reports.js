@@ -30,11 +30,13 @@ export const getReports = async (
     sort = "reported_at",
     order = "desc",
     month = "",
-    year = ""
+    year = "",
+    search = "",
+    status = ""
 ) => {
     try {
         const response = await api.get("/admin/reports/paginate/datum", {
-            params: { page, limit, sort, order, month, year }, // Tambahkan bulan & tahun untuk filter
+            params: { page, limit, sort, order, month, year, search, status },
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;

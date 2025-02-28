@@ -23,6 +23,14 @@ const months = [
   { label: "Desember", value: "12" },
 ];
 
+const statusOptions = [
+  { label: "Semua Status", value: "" },
+  { label: "Pending", value: "pending" },
+  { label: "On The Way", value: "on the way" },
+  { label: "In Progress", value: "in progress" },
+  { label: "Done", value: "done" },
+];
+
 const years = ["2025", "2026", "2027"];
 
 const LaporanMasuk = () => {
@@ -30,6 +38,8 @@ const LaporanMasuk = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedReport, setSelectedReport] = useState(null);
   const [selectedReportId, setSelectedReportId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
@@ -47,17 +57,29 @@ const LaporanMasuk = () => {
 
   useEffect(() => {
     fetchReports();
-  }, [currentPage, sortConfig, selectedMonth, selectedYear]);
+  }, [currentPage, sortConfig, selectedMonth, selectedYear, searchQuery, selectedStatus]);
 
   const fetchReports = async () => {
     try {
-      const data = await getReports(currentPage, 10, sortConfig.key, sortConfig.direction, selectedMonth, selectedYear);
+      const data = await getReports(
+        currentPage, 
+        10, 
+        sortConfig.key, 
+        sortConfig.direction, 
+        selectedMonth, 
+        selectedYear, 
+        searchQuery,
+        selectedStatus
+      );
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
-      return error
+      console.error("Error fetching reports:", error);
     }
-  };
+};
+
+  const statusOrder = { pending: 1, "on the way": 2, "in progress": 3, done: 4 };
+  const sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
   const openModal = (report) => {
     setSelectedReport(report);
@@ -102,7 +124,11 @@ const LaporanMasuk = () => {
     setSortConfig({ key, direction });
   };
 
-  
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+        fetchReports();
+    }
+};
 
   const handleStatusUpdate = async (report = null) => {
     if (!report) return;
@@ -160,7 +186,7 @@ const LaporanMasuk = () => {
       if (selectedReport?.status === "in progress") {
         await handleStatusUpdate(selectedReport, "done"); // +
       }
-  
+
       await fetchReports();
       closeSummaryModal();
 
@@ -184,30 +210,52 @@ const LaporanMasuk = () => {
 
         {/* Dropdown Filter Periode */}
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 text-sm">Periode:</span>
-          <div className="flex items-center bg-[#F9F9F9] px-3 py-2 rounded-lg border-none">
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-gray-700 outline-none cursor-pointer"
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 text-sm">Periode:</span>
+            <div className="flex items-center bg-[#F9F9F9] px-3 py-2 rounded-lg border-none">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent text-gray-700 outline-none cursor-pointer"
+              >
+                {months.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="bg-transparent text-gray-700 outline-none cursor-pointer ml-2"
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+          <select
+              className="border px-4 py-2 rounded-lg"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
             >
-              {months.map((month) => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="bg-transparent text-gray-700 outline-none cursor-pointer ml-2"
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="border px-4 py-2 rounded-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -218,7 +266,7 @@ const LaporanMasuk = () => {
           <thead>
             <tr className="bg-[#3C64FF] text-white">
               <th className="p-3 text-left">Token</th>
-              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("room")}>
+              <th className="p-3 text-left cursor-pointer" onClick={() => {handleSort("room");}}>
                 <span className="inline-flex items-center gap-3">
                   Ruangan
                   <div className="flex flex-col">
@@ -242,7 +290,7 @@ const LaporanMasuk = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-          {reports.map((report) => {
+          {sortedReports.map((report) => {
                 const statusFlow = {
                   // pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },

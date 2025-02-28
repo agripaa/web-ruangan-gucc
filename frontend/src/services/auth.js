@@ -1,5 +1,6 @@
 import api from "./api";
 
+
 export const login = async (username, password) => {
     try {
         const response = await api.post("/login", { username, password });
@@ -8,6 +9,7 @@ export const login = async (username, password) => {
         throw error.response?.data || "Login failed";
     }
 };
+
 
 export const register = async (userData) => {
     try {
@@ -18,6 +20,22 @@ export const register = async (userData) => {
     }
 };
 
+
+export const profile = async () => {
+    try {
+        const token = localStorage.getItem("token"); 
+        if (!token) throw { error: "Unauthorized - No Token Provided" };
+
+        const response = await api.get("/admin/user/profile", {
+            headers: { Authorization: `Bearer ${token}` } 
+        });
+        return response;
+    } catch (error) {
+        throw error.response?.data || "Unauthorized";
+    }
+};
+
+
 export const logoutUser = () => {
     localStorage.removeItem("token");
-  };  
+};

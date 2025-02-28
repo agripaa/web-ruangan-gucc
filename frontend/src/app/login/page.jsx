@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import LogoGUCC from "@/assets/Logo GUCC.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { login } from "@/services/auth";
+import { login, profile } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
 const Login = () => {
@@ -11,6 +11,25 @@ const Login = () => {
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await profile()
+
+          if (response.status === 200) {
+            router.push("/admin");
+          }
+        } catch (error) { 
+          console.log("Unauthorized - No Token Provided")
+        }
+      }
+    };
+
+    checkToken();
+  }, [router]);
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -22,8 +41,8 @@ const Login = () => {
 
     try {
       const data = await login(credentials.username, credentials.password);
-      localStorage.setItem("token", data.token); 
-      router.push("/admin"); 
+      localStorage.setItem("token", data.token);
+      router.push("/admin");
     } catch (err) {
       setError(err.error || "Login gagal, periksa kembali username dan password.");
     }
@@ -48,9 +67,7 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           {/* Username Field */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
-              Username
-            </label>
+            <label className="block text-gray-700 font-medium mb-2">Username</label>
             <input
               type="text"
               name="username"
@@ -64,9 +81,7 @@ const Login = () => {
 
           {/* Password Field */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
-              Password
-            </label>
+            <label className="block text-gray-700 font-medium mb-2">Password</label>
             <div className="relative">
               <input
                 type={passwordVisible ? "text" : "password"}

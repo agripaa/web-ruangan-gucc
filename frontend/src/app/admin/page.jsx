@@ -20,7 +20,7 @@ const Dashboard = () => {
   useEffect(() => {
     fetchActivityLog();
     fetchReportStats();
-  }, []);
+  }, [activityLog,reportStats]);
 
   const fetchActivityLog = async () => {
     try {
