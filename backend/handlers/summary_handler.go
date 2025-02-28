@@ -19,7 +19,7 @@ type SummaryRequest struct {
 
 func SaveReportSummary(c *fiber.Ctx) error {
 	reportIDStr := c.Params("reportId")
-	reportID, err := strconv.ParseUint(reportIDStr, 10, 32) // Konversi ke integer
+	reportID, err := strconv.ParseUint(reportIDStr, 10, 32)
 	if err != nil {
 		log.Println("Error parsing report ID:", err)
 

@@ -104,7 +104,7 @@ const LaporanMasuk = () => {
 
   
 
-  const handleStatusUpdate = async (report, newStatus = null) => {
+  const handleStatusUpdate = async (report = null) => {
     if (!report) return;
 
     const statusFlow = {
@@ -116,26 +116,18 @@ const LaporanMasuk = () => {
     const currentStatus = report.status;
     const nextStatus = statusFlow[currentStatus]?.next;
 
-    if (currentStatus === "done") {
-      // Jika status sudah "done", buka modal ringkasan
-      openSummaryModal(report);
-    }
-    // const nextStatus = newStatus || "done";
+    // if (currentStatus === "done") {
+    //   openSummaryModal(report);
+    // }
 
     if (!nextStatus) {
       console.warn(`⚠ handleStatusUpdate: No next status found for '${currentStatus}'`);
     return;
     }
-    // if (nextStatus === "done") {
-    //   openSummaryModal(report);
-    //   return;
-    // }  
+
 
     try {
-      console.log(`⏳ Updating status from '${currentStatus}' to '${nextStatus}' for report ID: ${report.ID}`);
       await updateReportStatus(report.ID, nextStatus);
-      console.log(`✅ Status updated to '${nextStatus}' for report ID: ${report.ID}`);
-
       await fetchReports
       await createActivityLog({
         type_log: "update report",
@@ -160,22 +152,19 @@ const LaporanMasuk = () => {
       Swal.fire("Warning", "Summary cannot be empty!", "warning");
       return;
     }
-    console.log("Saving summary:", { reportId: selectedReportId, adminId: 1, summary });
+
     try {
-      await saveReportSummary(selectedReportId, 1, summary); // Gunakan admin ID yang sesuai
-    
+      await saveReportSummary(selectedReportId, 1, summary);
       Swal.fire("Success", "Summary saved successfully!", "success");
       
       if (selectedReport?.status === "in progress") {
-        console.log("⏳ Updating status to 'done'...");
         await handleStatusUpdate(selectedReport, "done"); // +
-        
       }
   
       await fetchReports();
       closeSummaryModal();
+
     } catch (error) {
-      console.error("Error saving summary:", error);
       Swal.fire("Error", "Failed to save summary!", "error");
     }
   };
@@ -255,21 +244,19 @@ const LaporanMasuk = () => {
           <tbody className="bg-white">
           {reports.map((report) => {
                 const statusFlow = {
-                  pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
+                  // pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
                   "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
-                  "done": { 
-                    buttonText: "Summary", 
-                    color: "bg-red-500",
-                    onClick: (report) => {
-                        console.log("Summary button clicked!");
-                        // Bisa panggil modal atau fungsi lain
-                        openSummaryModal(report);
-                    }
-                },
+                //   "done": { 
+                //     // buttonText: "Summary", 
+                //     // color: "bg-red-500",
+                    
+                //     // onClick: (report) => {
+                //     //     openSummaryModal(report);
+                //     // }
+                // },
                 };
-                const statusData = statusFlow[report.status] || { text: "Unknown", color: "bg-white-500", disabled: true };
-                return (
+                  return (
                   <tr key={report.ID} className="border-b">
                     <td className="p-3">{report.token}</td>
                     <td className="p-3">{report.room}</td>
@@ -285,9 +272,13 @@ const LaporanMasuk = () => {
                     </button>
 
                     {report.status !== "in progress" ? (
+                      
                       <button
+                      
                         onClick={() => handleStatusUpdate(report)}
+                        disabled={report.status === "pending" || report.status === "done"}
                         className={`${statusFlow[report.status]?.color} text-white px-3 py-1 rounded-md`}
+                        
                       >
                         {statusFlow[report.status]?.buttonText}
                       </button>
@@ -312,19 +303,36 @@ const LaporanMasuk = () => {
       {/* MODAL DETAIL */}
       {isModalOpen && selectedReport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <h2 className="text-xl font-bold mb-4">Detail Laporan</h2>
-            <label className="block mt-4 font-semibold">Deskripsi Laporan:</label>
-            <textarea
-              className="w-full h-32 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700"
-              readOnly
-              value={selectedReport.description || "Tidak ada deskripsi tersedia"}
-            ></textarea>
-            <p><strong>Token:</strong> {selectedReport.token}</p>
-            <p><strong>Ruangan:</strong> {selectedReport.room}</p>
-            <p><strong>Teknisi:</strong> {selectedReport.worker ? selectedReport.worker.Username : "-"}</p>
-            <p><strong>Tanggal Laporan:</strong> {new Date(selectedReport.reported_at).toLocaleDateString()}</p>
-            <p><strong>Status:</strong> {selectedReport.status}</p>
+            <div className="flex flex-row justify-between">
+              <p><strong>Ruangan:</strong> {selectedReport.room}</p>
+              <p><strong>Teknisi:</strong> {selectedReport.worker ? selectedReport.worker.Username : "-"}</p>
+            </div>
+            <div className="flex flex-row justify-between">
+              <p><strong>Tanggal Laporan:</strong> {new Date(selectedReport.reported_at).toLocaleDateString()}</p>
+              <p><strong>Status:</strong> {selectedReport.status}</p>
+             </div>
+             <div className="flex flex-row justify-center gap-5 w-full"> 
+                <div className="w-full">  
+                  <label className="block mt-4 font-semibold">Deskripsi Laporan:</label>
+                  <textarea
+                    className="w-full h-40 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700 overflow-y-scroll"
+                    readOnly
+                    value={selectedReport.description || "Tidak ada deskripsi tersedia"}
+                  ></textarea>
+                </div>
+                {selectedReport.status === "done" && (
+                <div className="w-full"> 
+                <label className="block mt-4 font-semibold">Laporan Teknisi:</label>
+                  <textarea
+                    className="w-full h-40 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700 overflow-y-scroll"
+                    readOnly
+                    value={selectedReport.summary || "Tidak ada laporan tersedia"}
+                  ></textarea>
+                </div>
+                )}
+              </div>
             
             <div className="flex justify-between">
             <button
