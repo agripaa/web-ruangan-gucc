@@ -43,7 +43,7 @@ const LaporanMasuk = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
-  const [summary, setSummary] = useState("")
+  const [summary, setSummary] = useState("Belum ada laporan teknisi")
 
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
@@ -54,6 +54,7 @@ const LaporanMasuk = () => {
 
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
+
 
   useEffect(() => {
     fetchReports();
@@ -71,6 +72,7 @@ const LaporanMasuk = () => {
         searchQuery,
         selectedStatus
       );
+
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
@@ -81,9 +83,20 @@ const LaporanMasuk = () => {
   const statusOrder = { pending: 1, "on the way": 2, "in progress": 3, done: 4 };
   const sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
-  const openModal = (report) => {
+  const openModal = async (report) => {
     setSelectedReport(report);
     setIsModalOpen(true);
+
+    try {
+      if (report.status === "done") {
+        const responses = await getReportSummary(report.ID);
+        setSummary(responses.summary || "Belum ada laporan teknisi");
+      } else {
+        setSummary("Belum ada laporan teknisi");
+      }
+    } catch (error) {
+      setSummary("Gagal mengambil laporan teknisi");
+    }
   };
 
   const closeModal = () => {
@@ -92,22 +105,16 @@ const LaporanMasuk = () => {
   };
 
   const openSummaryModal = async (report) => {
+    if (!report || !report.ID) {
+      console.error("❌ Report tidak valid:", report);
+      return;
+    }
+
     setSelectedReport(report)
     setSelectedReportId(report.ID);
-    try {
-      const response = await saveReportSummary(report.ID);
-      const responses = await getReportSummary(report.ID);
-      
-      if (report.status === "in progress") {
-        setSummary(response.summary || "");
-    } else if (report.status === "done") {
-        setSummary(responses.summary || "");
-    }
-    
-    } catch (error) {
-      setSummary("");
-    }
+    setSummary("");
     setIsSummaryModalOpen(true);
+
   };
 
   const closeSummaryModal = () => {
@@ -141,10 +148,6 @@ const LaporanMasuk = () => {
 
     const currentStatus = report.status;
     const nextStatus = statusFlow[currentStatus]?.next;
-
-    // if (currentStatus === "done") {
-    //   openSummaryModal(report);
-    // }
 
     if (!nextStatus) {
       console.warn(`⚠ handleStatusUpdate: No next status found for '${currentStatus}'`);
@@ -295,14 +298,6 @@ const LaporanMasuk = () => {
                   // pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
                   "in progress": { next: "done", buttonText: "Selesai", color: "bg-green-500" },
-                //   "done": { 
-                //     // buttonText: "Summary", 
-                //     // color: "bg-red-500",
-                    
-                //     // onClick: (report) => {
-                //     //     openSummaryModal(report);
-                //     // }
-                // },
                 };
                   return (
                   <tr key={report.ID} className="border-b">
@@ -313,7 +308,9 @@ const LaporanMasuk = () => {
                     <td className="p-3">{report.status}</td>
                     <td className="flex p-3 gap-3">
                     <button
-                      onClick={() => openModal(report)}
+                      onClick={() => {
+                        openModal(report); 
+                      }}
                       className="bg-gray-400 text-white px-3 py-1 rounded-md"
                     >
                       Detail
@@ -351,7 +348,7 @@ const LaporanMasuk = () => {
       {/* MODAL DETAIL */}
       {isModalOpen && selectedReport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
+          <div className={`${selectedReport.status !== "done" ? "w-1/3" : "w-1/2"} bg-white p-6 rounded-lg shadow-lg`}> 
             <h2 className="text-xl font-bold mb-4">Detail Laporan</h2>
             <div className="flex flex-row justify-between">
               <p><strong>Ruangan:</strong> {selectedReport.room}</p>
@@ -364,20 +361,19 @@ const LaporanMasuk = () => {
              <div className="flex flex-row justify-center gap-5 w-full"> 
                 <div className="w-full">  
                   <label className="block mt-4 font-semibold">Deskripsi Laporan:</label>
-                  <textarea
+                  <p
                     className="w-full h-40 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700 overflow-y-scroll"
                     readOnly
-                    value={selectedReport.description || "Tidak ada deskripsi tersedia"}
-                  ></textarea>
+                  >{selectedReport.description || "Tidak ada deskripsi tersedia"}</p>
                 </div>
                 {selectedReport.status === "done" && (
                 <div className="w-full"> 
                 <label className="block mt-4 font-semibold">Laporan Teknisi:</label>
-                  <textarea
+                  <p
                     className="w-full h-40 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700 overflow-y-scroll"
                     readOnly
-                    value={selectedReport.summary || "Tidak ada laporan tersedia"}
-                  ></textarea>
+                    
+                  >{summary}</p>
                 </div>
                 )}
               </div>
@@ -412,7 +408,6 @@ const LaporanMasuk = () => {
       <label className="block mt-4 font-semibold">Summary:</label>
       <textarea
         className="w-full h-32 border border-gray-300 rounded-lg p-2 mt-1 bg-gray-100 text-gray-700"
-        value={summary}
         onChange={(e) => setSummary(e.target.value)}
       ></textarea>
 

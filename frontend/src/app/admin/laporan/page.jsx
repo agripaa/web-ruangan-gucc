@@ -19,6 +19,14 @@ const months = [
   { label: "Desember", value: "12" },
 ];
 
+const statusOptions = [
+  { label: "Semua Status", value: "" },
+  { label: "Pending", value: "pending" },
+  { label: "On The Way", value: "on the way" },
+  { label: "In Progress", value: "in progress" },
+  { label: "Done", value: "done" },
+];
+
 const years = ["2025", "2026", "2027"];
 
 const Laporan = () => {
@@ -26,6 +34,9 @@ const Laporan = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: "reported_at", direction: "desc" });
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const today = new Date();
   const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0"); 
@@ -36,18 +47,32 @@ const Laporan = () => {
 
   useEffect(() => {
     fetchReports();
-  }, [currentPage, sortConfig, selectedMonth, selectedYear]);
+  }, [currentPage, sortConfig, selectedMonth, selectedYear, searchQuery, selectedStatus]);
 
   const fetchReports = async () => {
     try {
       const monthValue = selectedMonth.toString().padStart(2, "0"); // Ensure two-digit format
-      const data = await getReports(currentPage, 10, sortConfig.key, sortConfig.direction, monthValue, selectedYear);
+      const data = await getReports(
+        currentPage, 
+        10, 
+        sortConfig.key, 
+        sortConfig.direction, 
+        selectedMonth, 
+        selectedYear, 
+        searchQuery,
+        selectedStatus
+      );
+
       setReports(data.data);
       setTotalPages(data.total_pages);
     } catch (error) {
       return error
     }
   };
+
+  const statusOrder = { pending: 1, "on the way": 2, "in progress": 3, done: 4 };
+  const sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -57,6 +82,11 @@ const Laporan = () => {
     setSortConfig({ key, direction });
   };
 
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+        fetchReports();
+    }
+};
   return (
     <div>
       {/* Lists Pengaduan Header */}
@@ -84,6 +114,26 @@ const Laporan = () => {
             </select>
           </div>
         </div>
+        <div className="flex items-center gap-3">
+          <select
+              className="border px-4 py-2 rounded-lg"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="border px-4 py-2 rounded-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
       </div>
 
       {/* Table */}
@@ -92,8 +142,24 @@ const Laporan = () => {
           <thead>
             <tr className="bg-[#3C64FF] text-white">
               <th className="p-3 text-left">Token</th>
-              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("room")}>Ruangan</th>
-              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("worker")}>Teknisi</th>
+              <th className="p-3 text-left cursor-pointer" onClick={() => {handleSort("room");}}>
+                <span className="inline-flex items-center gap-3">
+                  Ruangan
+                  <div className="flex flex-col">
+                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "room" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                </span>
+              </th>
+              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("technician")}>
+                <span className="inline-flex items-center gap-3">
+                  Teknisi
+                  <div className="flex flex-col">
+                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                </span>
+              </th>
               <th className="p-3 text-left">Status</th>
             </tr>
           </thead>

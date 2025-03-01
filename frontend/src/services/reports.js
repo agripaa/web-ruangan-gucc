@@ -119,27 +119,3 @@ export const getReportStatusCounts = async () => {
     return [];
   }
 };
-
-// export const saveReportSummary = async (reportId, summary) => {
-//     try {
-//         const response = await fetch(`/api/reports/${reportId}/summary`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ admin_id: 1, summary }),
-//     });
-//     return response.data;
-//   } catch (error) {
-//     throw error.response?.data || "Failed to save summary";
-//     }
-// };
-
-// export const getReportSummary = async (reportId) => {
-//     const response = await fetch(`/api/reports/${reportId}/summary`);
-
-//     if (!response.ok) {
-//         throw new Error("Failed to fetch summary");
-//     }
-
-//     const data = await response.json();
-//     return data.summary;
-// };
