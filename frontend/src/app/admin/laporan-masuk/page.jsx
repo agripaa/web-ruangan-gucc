@@ -183,7 +183,7 @@ const LaporanMasuk = () => {
     }
 
     try {
-      await saveReportSummary(selectedReportId, 1, summary);
+      await saveReportSummary(selectedReportId, summary);
       Swal.fire("Success", "Summary saved successfully!", "success");
       
       if (selectedReport?.status === "in progress") {

@@ -3,7 +3,6 @@ package routes
 import (
 	"backend/handlers"
 	"backend/middlewares"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -29,10 +28,7 @@ func SetupRoutes(app *fiber.App) {
 	reports.Post("/", handlers.CreateReport)
 
 	summary := api.Group("/summary")
-	summary.Post("/:reportId", func(c *fiber.Ctx) error {
-		fmt.Println("POST request masuk ke /summary/:reportId")
-		return handlers.SaveReportSummary(c)
-	})
+	summary.Post("/:reportId", handlers.SaveReportSummary)
 	summary.Get("/:reportId", handlers.GetReportSummary)
 
 	// Admin access requires authentication

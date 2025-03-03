@@ -22,8 +22,13 @@ func SaveReportSummary(c *fiber.Ctx) error {
 	reportID, err := strconv.ParseUint(reportIDStr, 10, 32)
 	if err != nil {
 		log.Println("Error parsing report ID:", err)
-
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid report ID"})
+	}
+
+	adminID, ok := c.Locals("user_id").(uint)
+	if !ok {
+		log.Println("Error getting admin ID from token")
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized - Admin ID not found"})
 	}
 
 	// Parse request body dengan error handling yang benar
@@ -47,7 +52,7 @@ func SaveReportSummary(c *fiber.Ctx) error {
 	if result.RowsAffected > 0 {
 		// Jika summary sudah ada, lakukan update
 		existingSummary.Summary = req.Summary
-		existingSummary.WorkerID = uint(req.WorkerID)
+		existingSummary.WorkerID = adminID
 		if err := config.DB.Save(&existingSummary).Error; err != nil {
 			log.Println("Error updating summary:", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update summary"})
@@ -56,7 +61,7 @@ func SaveReportSummary(c *fiber.Ctx) error {
 		// Jika belum ada, lakukan insert
 		newSummary := models.Summary{
 			ReportID: uint(reportID),
-			WorkerID: uint(req.WorkerID),
+			WorkerID: adminID,
 			Summary:  req.Summary,
 		}
 		fmt.Println("Inserting new summary:", newSummary)
