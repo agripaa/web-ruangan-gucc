@@ -27,10 +27,6 @@ func SetupRoutes(app *fiber.App) {
 	reports.Get("/search", handlers.SearchReportByToken)
 	reports.Post("/", handlers.CreateReport)
 
-	summary := api.Group("/summary")
-	summary.Post("/:reportId", handlers.SaveReportSummary)
-	summary.Get("/:reportId", handlers.GetReportSummary)
-
 	// Admin access requires authentication
 	admin := api.Group("/admin", middlewares.AuthMiddleware)
 
@@ -63,5 +59,7 @@ func SetupRoutes(app *fiber.App) {
 
 	adminSummary := admin.Group("/summary")
 	adminSummary.Post("/:reportId", handlers.SaveReportSummary)
+	adminSummary.Get("/", handlers.GetSummarys)
 	adminSummary.Get("/:reportId", handlers.GetReportSummary)
+	adminSummary.Delete("/:reportId", handlers.DeleteReportSummary)
 }

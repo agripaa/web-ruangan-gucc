@@ -12,6 +12,7 @@ import ProgressBar from "@/components/progressBar";
 import RoomStatus from "@/components/roomStatus";
 import { getCampuses } from "@/services/campus";
 import { getAllReport, createReport, getReportByToken } from "@/services/reports";
+import Swal from "sweetalert2";
 
 export default function Home() {
   const [reports, setReports] = useState([]);
@@ -117,10 +118,20 @@ export default function Home() {
         description: "",
       });
 
-      fetchReports();
+      Swal.fire({
+        title: "Success",
+        html: `<h2>Success to submit report!</h2>
+        <p>Nomor Pengaduan: <strong>${response.token}</strong></p>`,
+        icon: "success"
+      });
+      
+      fetchReports(); 
+      setIsOpen(false)
+
+      // fetchReports();
     } catch (error) {
-      alert("Gagal mengirim laporan!");
-      console.error("Error creating report:", error);
+      Swal.fire("Error", "Failed to submit report!", "error");
+      return error
     }
   };  
 

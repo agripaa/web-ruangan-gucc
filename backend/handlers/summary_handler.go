@@ -86,7 +86,7 @@ func GetReportSummary(c *fiber.Ctx) error {
 	}
 
 	var summary models.Summary
-	result := config.DB.Table("report_summaries").Where("report_id = ?", uint(reportID)).First(&summary)
+	result := config.DB.Preload("Worker").Preload("Report").Table("report_summaries").Where("report_id = ?", uint(reportID)).First(&summary)
 
 	// Perbaikan error handling
 	if result.Error != nil {
@@ -101,4 +101,23 @@ func GetReportSummary(c *fiber.Ctx) error {
 	config.DB.Table("report_summaries").Where("report_id = ?", uint(reportID)).First(&savedSummary)
 
 	return c.JSON(summary)
+}
+
+func GetSummarys(c *fiber.Ctx) error {
+	var summary []models.Summary
+	result := config.DB.Preload("Worker").Preload("Report").Find(&summary)
+
+	if result.Error != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Summary not found"})
+	}
+	
+	return c.JSON(summary)
+}
+
+func DeleteReportSummary(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if result := config.DB.Delete(&models.Summary{}, id); result.RowsAffected == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "Summary not found"})
+	}
+	return c.JSON(fiber.Map{"message": "Summary deleted successfully"})
 }
