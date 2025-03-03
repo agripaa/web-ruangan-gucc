@@ -115,9 +115,26 @@ func GetSummarys(c *fiber.Ctx) error {
 }
 
 func DeleteReportSummary(c *fiber.Ctx) error {
-	id := c.Params("id")
-	if result := config.DB.Delete(&models.Summary{}, id); result.RowsAffected == 0 {
-		return c.Status(404).JSON(fiber.Map{"error": "Summary not found"})
+	idStr := c.Params("reportId")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		log.Println("Error parsing report ID:", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid report ID"})
 	}
+
+	// Cek apakah data ada sebelum menghapusnya
+	var summary models.Summary
+	result := config.DB.Table("report_summaries").Where("report_id = ?", uint(id)).First(&summary)
+	if result.Error != nil {
+		log.Println("Error fetching summary:", result.Error)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Summary not found"})
+	}
+
+	// Hapus data jika ditemukan
+	deleteResult := config.DB.Table("report_summaries").Where("report_id = ?", uint(id)).Delete(&summary)
+	if deleteResult.RowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Summary not found"})
+	}
+
 	return c.JSON(fiber.Map{"message": "Summary deleted successfully"})
 }
