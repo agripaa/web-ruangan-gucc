@@ -6,9 +6,9 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { login, profile } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
-const LoginUser = () => {
+const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [credentials, setCredentials] = useState({ password: "" });
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -18,10 +18,9 @@ const LoginUser = () => {
       if (token) {
         try {
           const response = await profile()
-          console.log(response)
 
-          if (response.status === 200 && response.data.role === "user") {
-            router.push("/");
+          if (response.status === 200 && response.data.role === "admin") {
+            router.push("/admin");
           }
         } catch (error) { 
           console.log("Unauthorized - No Token Provided")
@@ -41,9 +40,9 @@ const LoginUser = () => {
     setError("");
 
     try {
-      const data = await login("test12", credentials.password);
+      const data = await login(credentials.username, credentials.password);
       localStorage.setItem("token", data.token);
-      router.push("/");
+      router.push("/admin");
     } catch (err) {
       setError(err.error || "Login gagal, periksa kembali username dan password.");
     }
@@ -59,13 +58,27 @@ const LoginUser = () => {
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-center mb-6">Login User</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
         {/* Error Message */}
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
         {/* Login Form */}
         <form onSubmit={handleSubmit}>
+          {/* Username Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Username</label>
+            <input
+              type="text"
+              name="username"
+              value={credentials.username}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+
           {/* Password Field */}
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-2">Password</label>
@@ -98,11 +111,11 @@ const LoginUser = () => {
           </button>
         </form>
         <div className="text-center mt-4">
-            <p className="text-sm font-medium">Do you admin? <a href="/login-admin" className="text-blue-500 underline hover:text-blue-600">Login Here!</a></p>
+            <p className="text-sm font-medium">Do you user? <a href="/login" className="text-blue-500 underline hover:text-blue-600">Login Here!</a></p>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginUser;
+export default Login;

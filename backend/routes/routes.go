@@ -15,7 +15,6 @@ func SetupRoutes(app *fiber.App) {
 
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
-	api.Post("/loginUser", handlers.UserLogin)
 
 	api.Post("/logs", handlers.CreateActivityLog)
 	api.Get("/create-report", handlers.GetCreateReportLogs)
