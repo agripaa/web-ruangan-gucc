@@ -56,7 +56,8 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-auto h-screen p-12 flex flex-col justify-between border-r">
+<aside className="w-auto h-screen p-12 flex flex-col justify-between border-r sticky top-0 bg-white">
+
       <div className="flex flex-col items-center w-full justify-center">
         <Image src={LogoGUCC} alt="logo gucc" width={70} className="mb-20" />
         <nav>
