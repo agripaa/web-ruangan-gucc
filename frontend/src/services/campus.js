@@ -4,7 +4,9 @@ const token = localStorage.getItem("token");
 
 export const getCampuses = async () => {
     try {
-      const response = await api.get("/campuses");
+      const response = await api.get("/client/campuses", {
+        headers: { Authorization: `Bearer ${token}` } 
+    });
       return response.data;
     } catch (error) {
       throw error.response?.data || "Failed to fetch campus";

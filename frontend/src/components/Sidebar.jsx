@@ -17,10 +17,19 @@ const Sidebar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await getProfile(); // Jika token valid
+        const response = await getProfile(); // Jika token valid
+        console.log({response})
+        if (response.role !== "admin") {
+          router.replace("/"); // Redirect ke "/" jika Forbidden
+        }
         setTokenValid(true);
       } catch (error) {
-        localStorage.removeItem("token");
+        console.log(error)
+        if (error.response && error.response.status === 403) {
+          router.replace("/"); // Redirect ke "/" jika Forbidden
+        } else {
+          router.replace("/login"); // Redirect ke login jika token tidak valid
+        }
         setTokenValid(false);
       } finally {
         setTokenChecked(true); // Tandai bahwa pengecekan selesai
@@ -28,13 +37,7 @@ const Sidebar = () => {
     };
 
     checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (tokenChecked && !tokenValid) {
-      router.push("/login");
-    }
-  }, [tokenChecked, tokenValid, router]);
+  }, [router]);
 
   if (!tokenChecked) {
     return null; // Jangan render apapun sebelum pengecekan selesai

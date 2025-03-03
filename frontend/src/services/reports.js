@@ -4,7 +4,9 @@ const token = localStorage.getItem("token");
 
 export const getAllReport = async () => {
     try {
-        const response = await api.get("/reports");
+        const response = await api.get("/client/reports",{
+            headers: { Authorization: `Bearer ${token}` } 
+        });
         return response.data;
     } catch(error) {
     console.error(error);
@@ -13,9 +15,11 @@ export const getAllReport = async () => {
 };
 
 export const getReportByToken = async (token) => {
+    const tokenAuth = localStorage.getItem("token");
     try {
-      const response = await api.get('/reports/search', {
-        params: {token}
+    const response = await api.get('/client/reports/search', {
+        params: {token},
+        headers: { Authorization: `Bearer ${tokenAuth}` } 
     });
       return response.data;
     } catch (error) {
@@ -47,7 +51,9 @@ export const getReports = async (
 
 export const createReport = async (reportData) => {
     try {
-      const response = await api.post("/reports", reportData);
+      const response = await api.post("/client/reports", reportData, {
+        headers: { Authorization: `Bearer ${token}` } 
+    });
       return response.data;
     } catch (error) {
       throw error.response?.data || "Failed to create report";
