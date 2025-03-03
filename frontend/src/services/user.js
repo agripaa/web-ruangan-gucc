@@ -5,7 +5,7 @@ export const getProfile = async () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const response = await api.get("/admin/user/profile", {
+        const response = await api.get("/client/user/profile", {
             headers: { Authorization: `Bearer ${token}` },
         });
 

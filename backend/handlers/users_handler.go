@@ -60,24 +60,25 @@ func Register(c *fiber.Ctx) error {
 func Login(c *fiber.Ctx) error {
 	var request AuthRequest
 	if err := c.BodyParser(&request); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+		return c.Status(400).JSON(fiber.Map{"error": "Field Cannot Be null!"})
 	}
 
 	var user models.User
 	result := config.DB.Where("username = ?", request.Username).First(&user)
 	if result.Error != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(401).JSON(fiber.Map{"error": "Username is not found!"})
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(401).JSON(fiber.Map{"error": "Password wrong!"})
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.ID
 	claims["username"] = user.Username
+	claims["role"] = user.Role
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	tokenString, err := token.SignedString(jwtSecret)

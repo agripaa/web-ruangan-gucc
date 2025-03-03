@@ -17,7 +17,9 @@ export const getActivityLogs = async () => {
 
 export const getActivityCreateReportLog = async () => {
   try {
-    const response = await api.get("/create-report");
+    const response = await api.get("/client/create-report", {
+      headers: { Authorization: `Bearer ${token}` } 
+  });
     return response.data.length > 0 ? response.data : [];
   } catch (error) {
     return [];
@@ -26,7 +28,9 @@ export const getActivityCreateReportLog = async () => {
 
 export const getActivityUpdateReportLog = async () => {
     try {
-      const response = await api.get("/update-report");
+      const response = await api.get("/client/update-report", {
+        headers: { Authorization: `Bearer ${token}` } 
+    });
       return response.data.length > 0 ? response.data : [];
     } catch (error) {
       return [];
@@ -35,7 +39,9 @@ export const getActivityUpdateReportLog = async () => {
 
 export const createActivityLog = async (logData) => {
   try {
-    const response = await api.post("/logs", logData);
+    const response = await api.post("/client/logs", logData, {
+      headers: { Authorization: `Bearer ${token}` } 
+  });
     return response.data;
   } catch (error) {
     throw error.response?.data || "Failed to create log";

@@ -10,28 +10,28 @@ import (
 func SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
-	api.Get("/campuses", handlers.GetCampuses)
-
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
 
-	api.Post("/logs", handlers.CreateActivityLog)
-	api.Get("/create-report", handlers.GetCreateReportLogs)
-	api.Get("/update-report", handlers.GetUpdateReportLogs)
-	api.Post("/summary", handlers.SaveReportSummary)
-	api.Get("/summary", handlers.GetReportSummary)
+	client := api.Group("/client", middlewares.AuthMiddleware)
+	client.Get("/campuses", handlers.GetCampuses)
+	client.Post("/logs", handlers.CreateActivityLog)
+	client.Get("/create-report", handlers.GetCreateReportLogs)
+	client.Get("/update-report", handlers.GetUpdateReportLogs)
+	client.Post("/summary", handlers.SaveReportSummary)
+	client.Get("/summary", handlers.GetReportSummary)
+
+	user := client.Group("/user")
+	user.Get("/profile", handlers.GetProfile)
 
 	// Public access reports
-	reports := api.Group("/reports")
+	reports := client.Group("/reports")
 	reports.Get("/", handlers.GetReports)
 	reports.Get("/search", handlers.SearchReportByToken)
 	reports.Post("/", handlers.CreateReport)
 
 	// Admin access requires authentication
-	admin := api.Group("/admin", middlewares.AuthMiddleware)
-
-	user := admin.Group("/user")
-	user.Get("/profile", handlers.GetProfile)
+	admin := api.Group("/admin", middlewares.AdminMiddleware)
 
 	adminReports := admin.Group("/reports")
 	adminReports.Get("/status/count", handlers.GetReportStatusCounts)

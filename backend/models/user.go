@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"log"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	ID          uint     `gorm:"primaryKey"`
@@ -15,4 +19,6 @@ func MigrateUsers(db *gorm.DB) {
 	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='phone_number') THEN ALTER TABLE users ADD COLUMN phone_number VARCHAR(255) NOT NULL DEFAULT ''; END IF; END $$;")
 	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='role') THEN ALTER TABLE users ADD COLUMN role VARCHAR(255) NOT NULL DEFAULT 'user'; END IF; END $$;")
 	db.AutoMigrate(&User{})
+
+	log.Println("Migrations completed.")
 }

@@ -26,7 +26,7 @@ export const profile = async () => {
         const token = localStorage.getItem("token"); 
         if (!token) throw { error: "Unauthorized - No Token Provided" };
 
-        const response = await api.get("/admin/user/profile", {
+        const response = await api.get("/client/user/profile", {
             headers: { Authorization: `Bearer ${token}` } 
         });
         return response;
