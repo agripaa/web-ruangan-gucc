@@ -2,10 +2,20 @@ import api from "./api";
 
 const token = localStorage.getItem("token");
 
-export const getAllReport = async () => {
+export const getAllReport = async (
+    page = 1,
+    limit = 10,
+    sort = "reported_at",
+    order = "desc",
+    month = "",
+    year = "",
+    search = "",
+    status = ""
+) => {
     try {
-        const response = await api.get("/client/reports",{
-            headers: { Authorization: `Bearer ${token}` } 
+        const response = await api.get("/client/reports/paginating",{
+            params: { page, limit, sort, order, month, year, search, status },
+            headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
     } catch(error) {

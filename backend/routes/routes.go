@@ -29,6 +29,7 @@ func SetupRoutes(app *fiber.App) {
 	reports.Get("/", handlers.GetReports)
 	reports.Get("/search", handlers.SearchReportByToken)
 	reports.Post("/", handlers.CreateReport)
+	reports.Get("/paginating", handlers.GetReportPagination)
 
 	// Admin access requires authentication
 	admin := api.Group("/admin", middlewares.AdminMiddleware)

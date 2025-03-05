@@ -5,9 +5,8 @@ import Logo from '@/assets/Universitas Gunadarma.png';
 import Search from '@/assets/Search.png';
 import Plus from '@/assets/Plus.png';
 import Back from '@/assets/Back.png';
-import Time from '@/assets/time.png';
 import notrack from '@/assets/no-tracks.png';
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "@/components/progressBar";
 import RoomStatus from "@/components/roomStatus";
 import { getCampuses } from "@/services/campus";
@@ -21,9 +20,9 @@ export default function Home() {
   const [reportToken, setReportToken] = useState(null);
   const [progressStep, setProgressStep] = useState(0);
   const [searchToken, setSearchToken] = useState("");
-  const [statusProgress, setStatusProgress] = useState(0)
 
-  const [forceRender, setForceRender] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+   const [totalPages, setTotalPages] = useState(1);
   
 
   const statusMapping = {
@@ -44,9 +43,13 @@ export default function Home() {
 
   async function fetchReports() {
     try {
-      const data = await getAllReport();
-      console.log("Data terbaru dari API:", data);
-      setReports([...data]);
+      const data = await getAllReport(
+        currentPage, 
+        4
+      );
+      setReports(data.data);  
+      setTotalPages(data.total_pages);
+      console.log("test", data)
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
@@ -56,11 +59,11 @@ export default function Home() {
 
     fetchCampuses();
     fetchReports();
-    const interval = setInterval(fetchReports, 5000); 
+    // const interval = setInterval(fetchReports, 5000); 
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
     
-  }, []);
+  }, [currentPage]);
 
   const fetchCampuses = async () => {
     try {
@@ -267,6 +270,50 @@ export default function Home() {
               <h2 className="room-date">{new Date(report.updated_at).toLocaleDateString()}</h2>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col items-center mt-4">
+        <div className="flex justify-center items-center">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
+            disabled={currentPage === 1}
+          >
+            {"<"}
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((page) => {
+              if (totalPages <= 3) return true; // Jika total halaman ≤ 3, tampilkan semua
+              if (currentPage === 1) return page <= 3; // Jika di halaman pertama, tampilkan 1, 2, 3
+              if (currentPage === totalPages) return page >= totalPages - 2; // Jika di halaman terakhir, tampilkan totalPages-2, totalPages-1, totalPages
+              return page >= currentPage - 1 && page <= currentPage + 1; // Tampilkan currentPage - 1, currentPage, currentPage + 1
+            })
+            .map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+                  currentPage === page ? "bg-blue-600 text-white" : "text-blue-600 hover:text-blue-800"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            className={`px-3 py-1 mx-1 text-sm font-semibold rounded-md ${
+              currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-blue-600 hover:text-blue-800"
+            }`}
+            disabled={currentPage === totalPages}
+          >
+            {">"}
+          </button>
         </div>
       </div>
     </div>
