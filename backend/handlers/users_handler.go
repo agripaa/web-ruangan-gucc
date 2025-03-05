@@ -4,6 +4,7 @@ import (
 	"backend/config"
 	"backend/models"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -106,4 +107,95 @@ func GetProfile(c *fiber.Ctx) error {
 		"phone_number": user.PhoneNumber,
 		"role":         user.Role,
 	})
+}
+
+func GetAdmins(c *fiber.Ctx) error {
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	var admins []models.User
+	var total int64
+
+	config.DB.Where("role = ?", "admin").Offset(offset).Limit(limit).Find(&admins)
+	config.DB.Model(&models.User{}).Where("role = ?", "admin").Count(&total)
+
+	return c.JSON(fiber.Map{
+		"data":  admins,
+		"page":  page,
+		"limit": limit,
+		"total": total,
+	})
+}
+
+func CreateAdmin(c *fiber.Ctx) error {
+	var request RegisterRequest
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
+	}
+
+	admin := models.User{
+		Username:    request.Username,
+		Password:    string(hashedPassword),
+		PhoneNumber: request.PhoneNumber,
+		Role:        "admin",
+	}
+
+	result := config.DB.Create(&admin)
+	if result.Error != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create admin"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Admin created successfully", "admin": admin})
+}
+
+func UpdateAdmin(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var admin models.User
+
+	if err := config.DB.First(&admin, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Admin not found"})
+	}
+
+	var request RegisterRequest
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	admin.Username = request.Username
+	admin.PhoneNumber = request.PhoneNumber
+
+	if request.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
+		}
+		admin.Password = string(hashedPassword)
+	}
+
+	config.DB.Save(&admin)
+	return c.JSON(fiber.Map{"message": "Admin updated successfully", "admin": admin})
+}
+
+func DeleteAdmin(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var admin models.User
+
+	if err := config.DB.First(&admin, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Admin not found"})
+	}
+
+	config.DB.Delete(&admin)
+	return c.JSON(fiber.Map{"message": "Admin deleted successfully"})
 }

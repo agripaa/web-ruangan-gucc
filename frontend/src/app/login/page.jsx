@@ -97,9 +97,6 @@ const LoginUser = () => {
             Login
           </button>
         </form>
-        <div className="text-center mt-4">
-            <p className="text-sm font-medium">Do you admin? <a href="/login-admin" className="text-blue-500 underline hover:text-blue-600">Login Here!</a></p>
-        </div>
       </div>
     </div>
   );

@@ -62,4 +62,10 @@ func SetupRoutes(app *fiber.App) {
 	adminSummary.Get("/", handlers.GetSummarys)
 	adminSummary.Get("/:reportId", handlers.GetReportSummary)
 	adminSummary.Delete("/:reportId", handlers.DeleteReportSummary)
+
+	adminUsers := admin.Group("/users")
+	adminUsers.Get("/", handlers.GetAdmins)
+	adminUsers.Post("/", handlers.CreateAdmin)
+	adminUsers.Put("/:id", handlers.UpdateAdmin)
+	adminUsers.Delete("/:id", handlers.DeleteAdmin)
 }

@@ -21,12 +21,12 @@ func getSecretKey() string {
 func AuthMiddleware(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - No Token Provided"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - No Token Provided"})
 	}
 
 	parts := strings.Split(authHeader, " ")
 	if len(parts) != 2 || parts[0] != "Bearer" {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token Format"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token Format"})
 	}
 	tokenString := parts[1]
 
@@ -35,12 +35,12 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	})
 
 	if err != nil || !token.Valid {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token"})
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token Claims"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token Claims"})
 	}
 
 	userID, ok := claims["user_id"].(float64)
@@ -55,12 +55,12 @@ func AuthMiddleware(c *fiber.Ctx) error {
 func AdminMiddleware(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - No Token Provided"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - No Token Provided"})
 	}
 
 	parts := strings.Split(authHeader, " ")
 	if len(parts) != 2 || parts[0] != "Bearer" {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token Format"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token Format"})
 	}
 	tokenString := parts[1]
 
@@ -69,12 +69,12 @@ func AdminMiddleware(c *fiber.Ctx) error {
 	})
 
 	if err != nil || !token.Valid {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token"})
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return c.Status(401).JSON(fiber.Map{"error": "Unauthorized - Invalid Token Claims"})
+		return c.Status(401).JSON(fiber.Map{"status": 401, "error": "Unauthorized - Invalid Token Claims"})
 	}
 
 	userID, ok := claims["user_id"].(float64)

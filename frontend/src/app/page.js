@@ -1,13 +1,14 @@
 "use client";
 import Image from "next/image";
 import '@/style/homepage.css';
+import { useRouter } from 'next/navigation';
 import Logo from '@/assets/Universitas Gunadarma.png';
 import Search from '@/assets/Search.png';
 import Plus from '@/assets/Plus.png';
 import Back from '@/assets/Back.png';
-import Time from '@/assets/time.png';
 import notrack from '@/assets/no-tracks.png';
 import React, { useEffect, useState, useReducer } from "react";
+import { getProfile } from '@/services/user';
 import ProgressBar from "@/components/progressBar";
 import RoomStatus from "@/components/roomStatus";
 import { getCampuses } from "@/services/campus";
@@ -21,10 +22,10 @@ export default function Home() {
   const [reportToken, setReportToken] = useState(null);
   const [progressStep, setProgressStep] = useState(0);
   const [searchToken, setSearchToken] = useState("");
-  const [statusProgress, setStatusProgress] = useState(0)
+  const [tokenChecked, setTokenChecked] = useState(false);
+  const [tokenValid, setTokenValid] = useState(false);
 
-  const [forceRender, setForceRender] = useState(0);
-  
+  const router = useRouter();
 
   const statusMapping = {
     pending: 1,
@@ -45,22 +46,11 @@ export default function Home() {
   async function fetchReports() {
     try {
       const data = await getAllReport();
-      console.log("Data terbaru dari API:", data);
       setReports([...data]);
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
   }
-
-  useEffect(() => {
-
-    fetchCampuses();
-    fetchReports();
-    const interval = setInterval(fetchReports, 5000); 
-
-    return () => clearInterval(interval);
-    
-  }, []);
 
   const fetchCampuses = async () => {
     try {
@@ -70,6 +60,42 @@ export default function Home() {
       console.error("Error fetching campuses:", error);
     }
   };
+
+  const checkAuth = async () => {
+    try {
+      const response = await getProfile(); 
+      setTokenValid(true);
+    } catch (error) {
+      console.log({error})
+      if (error && error.status === 401) {
+        router.replace("/login");
+      }
+      setTokenValid(false);
+    } finally {
+      setTokenChecked(true);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, [router])
+  
+  useEffect(() => {
+    fetchCampuses();
+    fetchReports();
+    const interval = setInterval(fetchReports, 5000); 
+
+    return () => clearInterval(interval);
+    
+  }, []);
+
+  if (!tokenChecked) {
+    return null; 
+  }
+
+  if (!tokenValid) {
+    return null; 
+  }
 
   const handleSearch = async () => {
     if (!searchToken.trim()) return;
