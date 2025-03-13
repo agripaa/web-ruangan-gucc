@@ -3,6 +3,9 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"bytes"
+	"encoding/json"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -32,6 +35,11 @@ type RegisterRequest struct {
 	PhoneNumber string `json:"phone_number"`
 }
 
+type LoginRequest struct {
+	Token    string `json:"token"`
+	ClientID string `json:"client_id"`
+}
+
 func Register(c *fiber.Ctx) error {
 	var request RegisterRequest
 	if err := c.BodyParser(&request); err != nil {
@@ -59,20 +67,72 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	var request AuthRequest
+	var request LoginRequest
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Field Cannot Be null!"})
 	}
 
-	var user models.User
-	result := config.DB.Where("username = ?", request.Username).First(&user)
-	if result.Error != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Username is not found!"})
+	if request.Token == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "Token is required!"})
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	data := map[string]string{
+		"client_id":     os.Getenv("CLIENT_ID"),
+		"client_secret": os.Getenv("CLIENT_SECRET_KEY"),
+		"token":         request.Token,
+	}
+	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Password wrong!"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to encode JSON"})
+	}
+
+	req, err := http.NewRequest("POST", os.Getenv("HTTP_API_LOGIN_ADMIN"), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create request"})
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to verify token"})
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusNotFound {
+		return c.Status(404).JSON(fiber.Map{"error": "Endpoint not found, check the URL"})
+	}
+
+	var apiResponse map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&apiResponse); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to parse response"})
+	}
+
+	userData, ok := apiResponse["user"].(map[string]interface{})
+	if !ok {
+		return c.Status(500).JSON(fiber.Map{"error": "Invalid response format"})
+	}
+
+	var user models.User
+
+	adminID, _ := userData["id"].(float64)
+	username, _ := userData["username"].(string)
+
+	result := config.DB.Where("admin_id = ?", uint(adminID)).First(&user)
+
+	if result.Error != nil {
+		newUser := models.User{
+			Username: username,
+			AdminID:  uint(adminID),
+			Role:     "admin",
+		}
+
+		if err := config.DB.Create(&newUser).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to create new user"})
+		}
+
+		user = newUser
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -80,6 +140,37 @@ func Login(c *fiber.Ctx) error {
 	claims["user_id"] = user.ID
 	claims["username"] = user.Username
 	claims["role"] = user.Role
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to generate token"})
+	}
+
+	return c.JSON(fiber.Map{"token": tokenString})
+}
+
+func LoginUser(c *fiber.Ctx) error {
+	var request AuthRequest
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	var user models.User
+	result := config.DB.Where("username = ?", request.Username).First(&user)
+	if result.Error != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+	}
+
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	claims["username"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	tokenString, err := token.SignedString(jwtSecret)

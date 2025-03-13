@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import LogoGUCC from "@/assets/Logo GUCC.png";
+import LogoGUCC from "../../assets/Logo GUCC.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { login, profile } from "@/services/auth";
+import { loginUser, profile } from "../../services/auth";
 import { useRouter } from "next/navigation";
 
 const LoginUser = () => {
@@ -18,7 +18,6 @@ const LoginUser = () => {
       if (token) {
         try {
           const response = await profile()
-          console.log(response)
 
           if (response.status === 200 && response.data.role === "user") {
             router.push("/");
@@ -41,7 +40,7 @@ const LoginUser = () => {
     setError("");
 
     try {
-      const data = await login("test12", credentials.password);
+      const data = await loginUser("test12", credentials.password);
       localStorage.setItem("token", data.token);
       router.push("/");
     } catch (err) {

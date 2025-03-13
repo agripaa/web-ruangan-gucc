@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import { getProfile, getAdmins, updateProfile, deleteAccount, logout } from "@/services/user";
+import { getProfile, getAdmins, updateProfile, deleteAccount, logout } from "../../../services/user";
 import { FaUserCircle, FaEdit, FaSignOutAlt, FaTrash, FaSearch, FaUserPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
 
@@ -113,8 +113,8 @@ const ProfilePage = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="flex gap-10 p-10">
-      <div className="w-1/3 bg-white shadow-md rounded-lg p-6 text-center">
+    <div className="flex w-full justify-center min-h-[70vh] items-center gap-10 p-10">
+      <div className="w-4/12 bg-white shadow-md rounded-lg p-6 text-center">
         <FaUserCircle className="text-gray-500 text-9xl mx-auto mb-4" />
         {editMode ? (
           <>
@@ -144,54 +144,6 @@ const ProfilePage = () => {
           <button onClick={handleDelete} className="flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded w-full mt-2"><FaTrash className="mr-2 flex-shrink-0"/> Delete</button>
         </div>
       </div>
-
-      <div className="w-2/3 bg-white shadow-md rounded-lg p-6">
-        <div className="flex justify-between mb-4">
-          <div className="flex">
-            <input type="text" placeholder="Search by name..." className="border p-2 w-full rounded" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-            <button onClick={fetchAdmins} className="bg-blue-500 text-white py-2 px-4 rounded ml-2"><FaSearch /></button>
-          </div>
-          <button onClick={() => setShowCreateModal(true)} className="bg-green-500 text-white py-2 px-4 rounded w-auto ml-2 flex items-center"><FaUserPlus className="mr-2 flex-shrink-0"/> Create Admin</button>
-        </div>
-        <h2 className="text-xl font-semibold mb-4">Admin Users</h2>
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-[#3C64FF] text-white">
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Username</th>
-              <th className="border p-2">Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr key={admin.ID} className="text-center">
-                <td className="border p-2">{admin.ID}</td>
-                <td className="border p-2">{admin.Username}</td>
-                <td className="border p-2">{admin.PhoneNumber || "-"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="flex justify-between mt-4">
-          <button disabled={page === 1} onClick={() => setPage(page - 1)} className="bg-gray-300 py-2 px-4 rounded">Prev</button>
-          <span>Page {page} of {totalPages}</span>
-          <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="bg-gray-300 py-2 px-4 rounded">Next</button>
-        </div>
-      </div>
-      {showCreateModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Create New Admin</h2>
-            <input type="text" placeholder="Username" className="border p-2 w-full rounded mb-2" value={newAdmin.username} onChange={(e) => setNewAdmin({ ...newAdmin, username: e.target.value })} />
-            <input type="text" placeholder="Phone Number" className="border p-2 w-full rounded mb-2" value={newAdmin.phone_number} onChange={(e) => setNewAdmin({ ...newAdmin, phone_number: e.target.value })} />
-            <input type="password" placeholder="Password" className="border p-2 w-full rounded mb-2" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} />
-            <div className="flex justify-end mt-4">
-              <button onClick={() => setShowCreateModal(false)} className="bg-gray-300 py-2 px-4 rounded mr-2">Cancel</button>
-              <button onClick={handleCreateAdmin} className="bg-green-500 text-white py-2 px-4 rounded">Create</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

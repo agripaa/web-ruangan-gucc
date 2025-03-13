@@ -12,12 +12,15 @@ type User struct {
 	Password    string   `gorm:"type:varchar(255);not null"`
 	PhoneNumber string   `gorm:"type:varchar(255);not null"`
 	Role        string   `gorm:"type:varchar(255);not null"`
+	AdminID     uint     `gorm:"not null" json:"admin_id"`
 	Reports     []Report `gorm:"foreignKey:WorkerID"` // Semua laporan yang dikerjakan oleh user
 }
 
 func MigrateUsers(db *gorm.DB) {
 	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='phone_number') THEN ALTER TABLE users ADD COLUMN phone_number VARCHAR(255) NOT NULL DEFAULT ''; END IF; END $$;")
 	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='role') THEN ALTER TABLE users ADD COLUMN role VARCHAR(255) NOT NULL DEFAULT 'user'; END IF; END $$;")
+	db.Exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_id INTEGER NULL;`)
+
 	db.AutoMigrate(&User{})
 
 	log.Println("Migrations completed.")

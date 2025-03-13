@@ -3,49 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { getProfile } from '@/services/user';
-import LogoGUCC from '@/assets/Logo GUCC.png';
+import LogoGUCC from '../assets/Logo GUCC.png';
 import { FaHome, FaClock, FaFolder, FaUser } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6"; 
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const router = useRouter();
-  const [tokenChecked, setTokenChecked] = useState(false);
-  const [tokenValid, setTokenValid] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await getProfile(); // Jika token valid
-        console.log({response})
-        if (response.role !== "admin") {
-          router.replace("/"); // Redirect ke "/" jika Forbidden
-        }
-        setTokenValid(true);
-      } catch (error) {
-        console.log(error)
-        if (error.response && error.response.status === 403) {
-          router.replace("/"); // Redirect ke "/" jika Forbidden
-        } else {
-          router.replace("/login"); // Redirect ke login jika token tidak valid
-        }
-        setTokenValid(false);
-      } finally {
-        setTokenChecked(true); // Tandai bahwa pengecekan selesai
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  if (!tokenChecked) {
-    return null; // Jangan render apapun sebelum pengecekan selesai
-  }
-
-  if (!tokenValid) {
-    return null; // Jangan render Sidebar jika token tidak valid
-  }
 
   const navItems = [
     { name: "Home", href: "/admin", icon: <FaHome /> },

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getReports, downloadExcel, downloadPDF } from "@/services/reports";
-import { FaSortUp, FaSortDown, FaChevronDown } from "react-icons/fa";
+import { getReports, downloadExcel, downloadPDF } from "../../../services/reports";
+import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 
 const months = [

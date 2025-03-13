@@ -12,6 +12,7 @@ func SetupRoutes(app *fiber.App) {
 
 	api.Post("/register", handlers.Register)
 	api.Post("/login", handlers.Login)
+	api.Post("/login/user", handlers.LoginUser)
 
 	client := api.Group("/client", middlewares.AuthMiddleware)
 	client.Get("/campuses", handlers.GetCampuses)
