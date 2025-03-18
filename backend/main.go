@@ -23,6 +23,7 @@ func main() {
 	models.MigrateCampus(config.DB)
 	models.MigrateRoles(config.DB)
 	models.MigrateSummary(config.DB)
+	models.MigrateActivitySeen(config.DB)
 
 	seeders.SeedUsers(config.DB)
 

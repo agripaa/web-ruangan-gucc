@@ -31,6 +31,11 @@ func SetupRoutes(app *fiber.App) {
 	reports.Post("/", handlers.CreateReport)
 	reports.Get("/paginating", handlers.GetReportPagination)
 
+	notif := client.Group("/notification")
+	notif.Get("/unread/:id", handlers.GetUnreadNotifications)
+	notif.Post("/mark-read/:id", handlers.MarkNotificationAsRead)
+	notif.Get("/has-new/:id", handlers.CheckNewNotifications)
+
 	// Admin access requires authentication
 	admin := api.Group("/admin", middlewares.AdminMiddleware)
 
@@ -63,4 +68,8 @@ func SetupRoutes(app *fiber.App) {
 	adminSummary.Get("/", handlers.GetSummarys)
 	adminSummary.Get("/:reportId", handlers.GetReportSummary)
 	adminSummary.Delete("/:reportId", handlers.DeleteReportSummary)
+
+	
 }
+
+

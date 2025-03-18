@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Summary struct {
+type Summary struct  {
 	ID        uint      `gorm:"primaryKey"`
 	ReportID  uint      `gorm:"not null" json:"report_id"`
 	WorkerID  uint      `gorm:"not null" json:"admin_id"`
