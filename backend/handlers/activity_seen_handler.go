@@ -4,25 +4,30 @@ import (
 	"backend/config"
 	"backend/models"
 	"github.com/gofiber/fiber/v2"
+	"fmt"
 )
 
 // GetUnreadNotifications mengambil jumlah notifikasi yang belum dibaca
 func GetUnreadNotifications(c *fiber.Ctx) error {
-	id := c.Params("id")
+	id := c.Locals("user_id")
+	
 	var count int64
 
 	config.DB.Model(&models.ActivitySeen{}).
 		Where("user_id = ? AND is_read = ?", id, false).
 		Count(&count)
 
+		fmt.Println("UserID:", id)
+
 	return c.JSON(fiber.Map{
+		
 		"unread_count": count,
 	})
 }
 
 // MarkNotificationAsRead mengubah status notifikasi menjadi terbaca
 func MarkNotificationAsRead(c *fiber.Ctx) error {
-	id := c.Params("id")
+	id := c.Locals("user_id")
 
 	config.DB.Model(&models.ActivitySeen{}).
 		Where("user_id = ? AND is_read = ?", id, false).
@@ -35,7 +40,7 @@ func MarkNotificationAsRead(c *fiber.Ctx) error {
 
 // CheckNewNotifications mengecek apakah ada notifikasi baru
 func CheckNewNotifications(c *fiber.Ctx) error {
-	id := c.Params("id")
+	id := c.Locals("user_id")
 	var count int64
 
 	config.DB.Model(&models.ActivitySeen{}).

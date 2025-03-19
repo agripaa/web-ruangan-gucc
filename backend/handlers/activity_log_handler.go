@@ -73,17 +73,25 @@ func CreateActivityLog(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity log", "details": result.Error.Error()})
 	}
 
-	activitySeen := models.ActivitySeen{
-		UserID:     *log.UserID,          // Pastikan UserID tersedia
-		ActivityID: log.ID,               // Menggunakan ID ActivityLog yang baru dibuat
-		IsRead:     false,                // Nilai default
-		CreatedAt:  time.Now().UTC(),     // Waktu saat ini
+	var users []models.User
+	if err := config.DB.Select("id").Find(&users).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch users", "details": err.Error()})
 	}
 
+	var activitySeenEntries []models.ActivitySeen
+	for _, user := range users {
+		activitySeenEntries = append(activitySeenEntries, models.ActivitySeen{
+			UserID:     user.ID,   // Setiap user mendapatkan entry
+			ActivityID: log.ID,    // ID dari activity_log yang baru dibuat
+			IsRead:     false,     // Default belum dibaca
+			CreatedAt:  time.Now().UTC(),
+		})
+	}
+
+
 	// Simpan entri ActivitySeen
-	seenResult := config.DB.Create(&activitySeen)
-	if seenResult.Error != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity seen", "details": seenResult.Error.Error()})
+	if err := config.DB.Create(&activitySeenEntries).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity seen entries", "details": err.Error()})
 	}
 
 	return c.Status(201).JSON(log)
