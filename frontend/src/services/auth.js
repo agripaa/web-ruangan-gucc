@@ -1,9 +1,19 @@
 import api from "./api";
 
 
-export const login = async (username, password) => {
+export const login = async (token) => {
     try {
-        const response = await api.post("/login", { username, password });
+        const response = await api.post("/login", { token });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Login failed";
+    }
+};
+
+
+export const loginUser = async (username, password) => {
+    try {
+        const response = await api.post("/login/user", { username, password });
         return response.data;
     } catch (error) {
         throw error.response?.data || "Login failed";

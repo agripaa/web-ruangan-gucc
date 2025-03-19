@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import { getReportStatusCounts } from "@/services/reports";
-import { getActivityUpdateReportLog } from "@/services/logs";
+import { getReportStatusCounts } from "../../services/reports";
+import { getActivityUpdateReportLog } from "../../services/logs";
 
 const Dashboard = () => {
   const [activityLog, setActivityLog] = useState([]);

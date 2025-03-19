@@ -1,16 +1,16 @@
 "use client";
 import Image from "next/image";
-import '@/style/homepage.css';
-import Logo from '@/assets/Universitas Gunadarma.png';
-import Search from '@/assets/Search.png';
-import Plus from '@/assets/Plus.png';
-import Back from '@/assets/Back.png';
-import notrack from '@/assets/no-tracks.png';
+import '../style/homepage.css';
+import Logo from '../assets/Universitas Gunadarma.png';
+import Search from '../assets/Search.png';
+import Plus from '../assets/Plus.png';
+import Back from '../assets/Back.png';
+import notrack from '../assets/no-tracks.png';
 import React, { useEffect, useState } from "react";
-import ProgressBar from "@/components/progressBar";
-import RoomStatus from "@/components/roomStatus";
-import { getCampuses } from "@/services/campus";
-import { getAllReport, createReport, getReportByToken } from "@/services/reports";
+import ProgressBar from "../components/progressBar";
+import RoomStatus from "../components/roomStatus";
+import { getCampuses } from "../services/campus";
+import { getAllReport, createReport, getReportByToken } from "../services/reports";
 import Swal from "sweetalert2";
 
 export default function Home() {
@@ -74,6 +74,15 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    fetchCampuses();
+    fetchReports();
+    const interval = setInterval(fetchReports, 5000); 
+
+    return () => clearInterval(interval);
+    
+  }, []);
+
   const handleSearch = async () => {
     if (!searchToken.trim()) return;
 
@@ -124,7 +133,7 @@ export default function Home() {
       Swal.fire({
         title: "Success",
         html: `<h2>Success to submit report!</h2>
-        <p>Nomor Pengaduan: <strong>${response.token}</strong></p>`,
+        <p>Harap Simpan Nomor Pengaduan: <strong>${response.token}</strong></p>`,
         icon: "success"
       });
       

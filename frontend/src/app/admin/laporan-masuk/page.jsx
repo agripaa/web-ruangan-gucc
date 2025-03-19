@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getReports, updateReportStatus } from "@/services/reports";
-import { getReportSummary, saveReportSummary } from "@/services/summary";
+import { getReports, updateReportStatus } from "../../../services/reports";
+import { getReportSummary, saveReportSummary } from "../../../services/summary";
 
-import { createActivityLog } from "@/services/logs";
+import { createActivityLog } from "../../../services/logs";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import Swal from "sweetalert2";

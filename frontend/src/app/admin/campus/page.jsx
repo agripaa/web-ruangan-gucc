@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getCampusesPaginate, createCampus, updateCampus, deleteCampus } from "@/services/campus";
+import { getCampusesPaginate, createCampus, updateCampus, deleteCampus } from "../../../services/campus";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6";
 import Swal from "sweetalert2";
-import Modal from "@/components/Modal";
+import Modal from "../../../components/Modal";
 
 const Campus = () => {
   const [campuses, setCampuses] = useState([]); 
