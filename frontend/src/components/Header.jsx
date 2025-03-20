@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { getCampuses } from "@/services/campus";
 import { createReport } from "@/services/reports";
-import { logoutUser } from "@/services/auth";
+import { logoutUser } from "../services/auth";
 import { getActivityCreateReportLog, createActivityLog, getActivityUpdateReportLog } from "@/services/logs";
 import { getUnreadNotificationsCount, markNotificationsAsRead } from "../services/seen";
 import { FaBell, FaPlus } from "react-icons/fa";
@@ -29,8 +29,17 @@ const Header = ({ id }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
+    if (!token) {
+      router.push("/login");
+      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
+    }
+
     const fetchUnreadCount = async () => {
       setLoading(true);
       const count = await getUnreadNotificationsCount(id);

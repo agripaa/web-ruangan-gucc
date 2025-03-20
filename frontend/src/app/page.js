@@ -12,6 +12,8 @@ import RoomStatus from "../components/roomStatus";
 import { getCampuses } from "../services/campus";
 import { getAllReport, createReport, getReportByToken } from "../services/reports";
 import Swal from "sweetalert2";
+import { profile } from "../services/auth";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [reports, setReports] = useState([]);
@@ -55,13 +57,19 @@ export default function Home() {
     }
   }
 
-  useEffect(() => {
+   const router = useRouter();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
+    if (!token) {
+      router.push("/login");
+      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
+    }
+  
     fetchCampuses();
     fetchReports();
-    // const interval = setInterval(fetchReports, 5000); 
-
-    // return () => clearInterval(interval);
     
   }, [currentPage]);
 
@@ -75,6 +83,14 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
+    if (!token) {
+      router.push("/login");
+      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
+    }
+
     fetchCampuses();
     fetchReports();
     const interval = setInterval(fetchReports, 5000); 
