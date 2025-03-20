@@ -40,12 +40,15 @@ const Dashboard = () => {
   const fetchReportStats = async () => {
     try {
       const data = await getReportStatusCounts();
-      setReportStats(data.map(item => ({
-        name: item.status.toUpperCase(),
-        value: item.count
-      })));
+      setReportStats(
+        data.map((item, index) => ({
+          name: item.status.toUpperCase(),
+          value: item.count,
+          color: COLORS[index % COLORS.length], // Tambahkan warna berdasarkan indeks
+        }))
+      );
     } catch (error) {
-      return error
+      return error;
     }
   };
 
@@ -69,7 +72,12 @@ const Dashboard = () => {
                   <p className="font-semibold">{log.action}</p>
                   <p className="text-gray-700">{log.detail_action?.replace("{username}", log.User?.Username || "Unknown")}</p>
                   {log.Report && (
-                    <p className="text-sm text-gray-500">
+                    <p
+                      className="text-sm text-white text-center px-1 py-1 rounded-md w-1/2"
+                      style={{
+                        backgroundColor: reportStats.find(stat => stat.name === log.Report.status.toUpperCase())?.color || "#ccc",
+                      }}
+                    >
                       Room: {log.Report.room}, Status: {log.Report.status}
                     </p>
                   )}
