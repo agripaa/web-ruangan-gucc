@@ -1,13 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getCampuses } from "../services/campus";
-import { createReport } from "../services/reports";
-import { logoutUser } from "../services/auth";
-import { getActivityCreateReportLog, createActivityLog } from "../services/logs";
+import { getCampuses } from "@/services/campus";
+import { createReport } from "@/services/reports";
+import { logoutUser } from "@/services/auth";
+import { getActivityCreateReportLog, createActivityLog, getActivityUpdateReportLog } from "@/services/logs";
+import { getUnreadNotificationsCount, markNotificationsAsRead } from "../services/seen";
 import { FaBell, FaPlus } from "react-icons/fa";
 import Image from "next/image";
-import LogoGunadarma from "../assets/Universitas Gunadarma.png";
-import Modal from "../components/Modal";
+import LogoGunadarma from "@/assets/Universitas Gunadarma.png";
+import Modal from "@/components/Modal";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
