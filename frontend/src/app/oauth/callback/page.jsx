@@ -9,17 +9,21 @@ const page = () => {
     const searchParams = useSearchParams();
     const token = searchParams.get('token');
 
-    useEffect(async()=> {
-        try {
-          const data = await login(token);
-          console.log({data})
-          localStorage.setItem("token", data.token)
-          router.push('/admin')
-        } catch (err) {
-          console.log(err)
-          setError(err.error || "Login gagal, periksa kembali username dan password.");
-        }
-    })
+    const handleVerify = async() => {
+      try {
+        const data = await login(token);
+        console.log({data})
+        localStorage.setItem("token", data.token);
+        router.push('/admin');
+      } catch (err) {
+        console.log(err)
+        setError(err.error || "Login gagal, periksa kembali username dan password.");
+      }
+    }
+
+    useEffect(()=> {
+      handleVerify();
+    }, [])
     
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
