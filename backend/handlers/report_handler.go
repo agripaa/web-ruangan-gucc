@@ -191,11 +191,19 @@ func SearchReportByToken(c *fiber.Ctx) error {
 	config.DB.Preload("Campus").Where("token LIKE ?", "%"+token+"%").Find(&reports)
 
 	if len(reports) == 0 {
-		return c.Status(404).JSON(fiber.Map{"error": "No reports found"})
+		// Ubah dari status 404 menjadi status 200 dengan array kosong
+		return c.JSON(fiber.Map{
+			"message": "No reports found",
+			"data":    []models.Report{}, // Kembalikan array kosong agar tidak dianggap error di frontend
+		})
 	}
 
-	return c.JSON(reports)
+	return c.JSON(fiber.Map{
+		"message": "Reports found",
+		"data":    reports,
+	})
 }
+
 
 func GetReportPagination(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))

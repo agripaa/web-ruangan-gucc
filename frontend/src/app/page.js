@@ -51,7 +51,6 @@ export default function Home() {
       );
       setReports(data.data);  
       setTotalPages(data.total_pages);
-      console.log("test", data)
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
@@ -101,20 +100,32 @@ export default function Home() {
 
   const handleSearch = async () => {
     if (!searchToken.trim()) return;
-
+  
     try {
-      const result = await getReportByToken(searchToken);
-      if (result.length > 0) {
-        setProgressStep(statusMapping[result[0].status] || 0);
+      const response = await getReportByToken(searchToken);
+  
+      if (response.data.length > 0) {
+        setProgressStep(statusMapping[response.data[0].status] || 0);
       } else {
         setProgressStep(-1);
+        Swal.fire({
+          title: "Pengaduan Tidak Ditemukan",
+          text: "Mohon periksa kembali token yang Anda masukkan.",
+          icon: "warning",
+          confirmButtonText: "Tutup",
+        });
       }
     } catch (error) {
       console.error("Error searching report:", error);
-      setProgressStep(-1);
+      Swal.fire({
+        title: "Terjadi Kesalahan",
+        text: "Silakan coba lagi nanti.",
+        icon: "error",
+        confirmButtonText: "Tutup",
+      });
     }
   };
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
