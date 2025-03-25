@@ -8,7 +8,7 @@ import { getUnreadNotificationsCount, markNotificationsAsRead } from "../service
 import { FaBell, FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import LogoGunadarma from "@/assets/Universitas Gunadarma.png";
-import Modal from "@/components/Modal";
+import Modal from "../components/Modal";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
@@ -141,11 +141,10 @@ const Header = ({ id }) => {
       </div>
 
       <Modal
-        isOpen={isNotifModalOpen}
-        title="Activity Log"
-        onClose={() => setIsNotifModalOpen(false)}
-        submitText="Close"
-        onSubmit={() => setIsNotifModalOpen(false)}
+  isOpen={isNotifModalOpen}
+  title="Activity Log"
+  onClose={() => setIsNotifModalOpen(false)}
+  submitText="Close"
       >
         <div className="max-h-64 overflow-y-auto border rounded-md p-2">
           {notifications.length > 0 ? (

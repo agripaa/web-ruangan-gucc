@@ -61,10 +61,9 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
     if (!token) {
       router.push("/login");
-      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
+      return; 
     }
   
     fetchCampuses();
@@ -108,12 +107,12 @@ export default function Home() {
         setProgressStep(statusMapping[response.data[0].status] || 0);
       } else {
         setProgressStep(-1);
-        Swal.fire({
-          title: "Pengaduan Tidak Ditemukan",
-          text: "Mohon periksa kembali token yang Anda masukkan.",
-          icon: "warning",
-          confirmButtonText: "Tutup",
-        });
+        // Swal.fire({
+        //   title: "Pengaduan Tidak Ditemukan",
+        //   text: "Mohon periksa kembali token yang Anda masukkan.",
+        //   icon: "warning",
+        //   confirmButtonText: "Tutup",
+        // });
       }
     } catch (error) {
       console.error("Error searching report:", error);
@@ -125,7 +124,7 @@ export default function Home() {
       });
     }
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
