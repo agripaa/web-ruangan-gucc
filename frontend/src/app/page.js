@@ -12,8 +12,7 @@ import RoomStatus from "../components/roomStatus";
 import { getCampuses } from "../services/campus";
 import { getAllReport, createReport, getReportByToken } from "../services/reports";
 import Swal from "sweetalert2";
-import { profile } from "../services/auth";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [reports, setReports] = useState([]);
@@ -22,10 +21,11 @@ export default function Home() {
   const [reportToken, setReportToken] = useState(null);
   const [progressStep, setProgressStep] = useState(0);
   const [searchToken, setSearchToken] = useState("");
-
-  const [currentPage, setCurrentPage] = useState(1);
-   const [totalPages, setTotalPages] = useState(1);
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const router = useRouter();
 
   const statusMapping = {
     pending: 1,
@@ -51,24 +51,22 @@ export default function Home() {
       );
       setReports(data.data);  
       setTotalPages(data.total_pages);
+      console.log("test", data)
     } catch (error) {
       console.error("Error fetching reports:", error);
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
     }
   }
 
-   const router = useRouter();
-
   useEffect(() => {
-    const token = localStorage.getItem("token");
 
-    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
-    if (!token) {
-      router.push("/login");
-      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
-    }
-  
     fetchCampuses();
     fetchReports();
+    // const interval = setInterval(fetchReports, 5000); 
+
+    // return () => clearInterval(interval);
     
   }, [currentPage]);
 
@@ -78,18 +76,13 @@ export default function Home() {
       setCampuses(data || []);
     } catch (error) {
       console.error("Error fetching campuses:", error);
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
     }
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    // Jika tidak ada token, langsung arahkan ke /login dan hentikan eksekusi
-    if (!token) {
-      router.push("/login");
-      return; // Menghentikan eksekusi lebih lanjut jika tidak ada token
-    }
-
     fetchCampuses();
     fetchReports();
     const interval = setInterval(fetchReports, 5000); 
@@ -100,32 +93,23 @@ export default function Home() {
 
   const handleSearch = async () => {
     if (!searchToken.trim()) return;
-  
+
     try {
-      const response = await getReportByToken(searchToken);
-  
-      if (response.data.length > 0) {
-        setProgressStep(statusMapping[response.data[0].status] || 0);
+      const result = await getReportByToken(searchToken);
+      if (result.data.length > 0) {
+        setProgressStep(statusMapping[result.data[0].status] || 0);
       } else {
         setProgressStep(-1);
-        Swal.fire({
-          title: "Pengaduan Tidak Ditemukan",
-          text: "Mohon periksa kembali token yang Anda masukkan.",
-          icon: "warning",
-          confirmButtonText: "Tutup",
-        });
       }
     } catch (error) {
       console.error("Error searching report:", error);
-      Swal.fire({
-        title: "Terjadi Kesalahan",
-        text: "Silakan coba lagi nanti.",
-        icon: "error",
-        confirmButtonText: "Tutup",
-      });
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
+      setProgressStep(-1);
     }
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -170,6 +154,9 @@ export default function Home() {
       // fetchReports();
     } catch (error) {
       Swal.fire("Error", "Failed to submit report!", "error");
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
       return error
     }
   };  

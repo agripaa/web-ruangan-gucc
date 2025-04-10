@@ -1,15 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getCampuses } from "@/services/campus";
-import { createReport } from "@/services/reports";
+import { getCampuses } from "../services/campus";
 import { logoutUser } from "../services/auth";
-import { getActivityCreateReportLog, createActivityLog, getActivityUpdateReportLog } from "@/services/logs";
+import { getActivityUpdateReportLog } from "../services/logs";
 import { getUnreadNotificationsCount, markNotificationsAsRead } from "../services/seen";
-import { FaBell, FaPlus } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
 import Image from "next/image";
-import LogoGunadarma from "@/assets/Universitas Gunadarma.png";
-import Modal from "@/components/Modal";
-import Swal from "sweetalert2";
+import LogoGunadarma from "../assets/Universitas Gunadarma.png";
+import Modal from "../components/Modal";
 import { useRouter } from "next/navigation";
 
 const Header = ({ id }) => {
@@ -65,11 +63,6 @@ const Header = ({ id }) => {
   return () => clearInterval(intervalId);
   }, [id]);
 
-  const fetchNotificationsPeriodically = () => {
-    const intervalId = setInterval(fetchNotifications, 10000); // 10 detik
-    return intervalId;
-  };
-
   const handleClick = async () => {
     handleOpenNotifications();
     await markNotificationsAsRead(id);
@@ -91,6 +84,7 @@ const Header = ({ id }) => {
       setNotifications(logs || []);
       setUnreadNotifications(logs.length > 0);
     } catch (error) {
+      console.log(error)
       return error;
     }
   };

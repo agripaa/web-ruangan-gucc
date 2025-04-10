@@ -13,7 +13,9 @@ try {
   return response.data.unread_count; // Mengembalikan jumlah notifikasi yang belum dibaca
 } catch (error) {
   console.error("Error fetching unread notifications count:", error);
-  
+  if([400, 401, 402, 403].includes(error.status)){
+    window.location.href = '/login-admin'
+  }
 }
 };
 

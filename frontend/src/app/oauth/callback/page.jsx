@@ -12,7 +12,6 @@ const page = () => {
     const handleVerify = async() => {
       try {
         const data = await login(token);
-        console.log({data})
         localStorage.setItem("token", data.token);
         router.push('/admin');
       } catch (err) {

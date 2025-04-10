@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { getReportStatusCounts } from "../../services/reports";
 import { getActivityUpdateReportLog } from "../../services/logs";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
+  const router = useRouter();
   const [activityLog, setActivityLog] = useState([]);
   const [reportStats, setReportStats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     fetchActivityLog();
     fetchReportStats();
-  }, [activityLog,reportStats]);
+  }, []);
 
   const fetchActivityLog = async () => {
     try {
@@ -31,6 +33,10 @@ const Dashboard = () => {
         setActivityLog(logs);
       }
     } catch (error) {
+      console.log(error)
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
       return error
     } finally {
       setLoading(false);
@@ -48,6 +54,9 @@ const Dashboard = () => {
         }))
       );
     } catch (error) {
+      if([400, 401, 402, 403].includes(error.status)){
+        router.push('/login')
+      }
       return error;
     }
   };

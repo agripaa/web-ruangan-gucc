@@ -52,8 +52,9 @@ const LaporanMasuk = () => {
   const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0"); 
   const currentYear = today.getFullYear().toString();
 
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  let sortedReports;
 
 
   useEffect(() => {
@@ -63,12 +64,12 @@ const LaporanMasuk = () => {
   const fetchReports = async () => {
     try {
       const data = await getReports(
-        currentPage, 
-        10, 
-        sortConfig.key, 
-        sortConfig.direction, 
-        selectedMonth, 
-        selectedYear, 
+        currentPage,
+        10,
+        sortConfig.key,
+        sortConfig.direction,
+        selectedMonth || null,
+        selectedYear || null,
         searchQuery,
         selectedStatus
       );
@@ -82,7 +83,11 @@ const LaporanMasuk = () => {
 };
 
   const statusOrder = { pending: 1, "on the way": 2, "in progress": 3, done: 4 };
-  const sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+  console.log({reports})
+  
+  if(reports){
+    sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+  }
 
   const openModal = async (report) => {
     setSelectedReport(report);
@@ -158,7 +163,7 @@ const LaporanMasuk = () => {
 
     try {
       await updateReportStatus(report.ID, nextStatus);
-      await fetchReports
+      await fetchReports()
       await createActivityLog({
         type_log: "update report",
         action: `${report.worker ? report.worker.Username : "Someone"} Update Report`,
@@ -222,12 +227,14 @@ const LaporanMasuk = () => {
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="bg-transparent text-gray-700 outline-none cursor-pointer"
               >
+                <option value="">Semua Bulan</option>
                 {months.map((month) => (
                   <option key={month.value} value={month.value}>
                     {month.label}
                   </option>
                 ))}
               </select>
+
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
@@ -294,7 +301,8 @@ const LaporanMasuk = () => {
             </tr>
           </thead>
           <tbody className="bg-white">
-          {sortedReports.map((report) => {
+          {sortedReports ? 
+            sortedReports?.map((report) => {
                 const statusFlow = {
                   // pending: { next: "on the way", buttonText: "Ambil", color: "bg-blue-500" },
                   "on the way": { next: "in progress", buttonText: "Progress", color: "bg-yellow-500" },
@@ -341,7 +349,9 @@ const LaporanMasuk = () => {
                   </td>
                 </tr>
               );
-            })}
+            }): (
+              <tr><td colSpan="4" className="p-3 text-center text-gray-500">Tidak ada laporan</td></tr>
+            )}
           </tbody>
         </table>
       </div>
