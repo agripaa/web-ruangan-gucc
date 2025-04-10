@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import { getProfile, getAdmins, updateProfile, deleteAccount, logout } from "../../../services/user";
-import { FaUserCircle, FaEdit, FaSignOutAlt, FaTrash, FaSearch, FaUserPlus } from "react-icons/fa";
+import { FaUserCircle, FaEdit, FaSignOutAlt, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const ProfilePage = () => {
@@ -34,17 +34,6 @@ const ProfilePage = () => {
     }
   };
 
-  const handleCreateAdmin = async () => {
-    try {
-      await createAdmin(newAdmin);
-      setShowCreateModal(false);
-      fetchAdmins();
-      Swal.fire("Success", "Admin created successfully", "success");
-    } catch (error) {
-      Swal.fire("Error", "Failed to create admin", "error");
-    }
-  };
-
 
   const fetchAdmins = async () => {
     try {
@@ -52,7 +41,6 @@ const ProfilePage = () => {
       setAdmins(adminData.data);
       setTotalPages(Math.ceil(adminData.total / 10));
     } catch (error) {
-      console.error("Failed to load admin data", error);
     }
   };
 

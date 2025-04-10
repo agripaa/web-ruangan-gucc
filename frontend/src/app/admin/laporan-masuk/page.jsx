@@ -78,12 +78,10 @@ const LaporanMasuk = () => {
       setTotalPages(data.total_pages);
       
     } catch (error) {
-      console.error("Error fetching reports:", error);
     }
 };
 
   const statusOrder = { pending: 1, "on the way": 2, "in progress": 3, done: 4 };
-  console.log({reports})
   
   if(reports){
     sortedReports = [...reports].sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
@@ -112,7 +110,6 @@ const LaporanMasuk = () => {
 
   const openSummaryModal = async (report) => {
     if (!report || !report.ID) {
-      console.error("❌ Report tidak valid:", report);
       return;
     }
 

@@ -19,7 +19,6 @@ export const getAllReport = async (
         });
         return response.data;
     } catch(error) {
-    console.error(error);
     throw error.response?.data || "Failed to get data reports";
   }
 };
@@ -33,7 +32,6 @@ export const getReportByToken = async (token) => {
     });
       return response.data;
     } catch (error) {
-      console.error(error);
       throw error.response?.data || "Failed to get data report by Token";
     }
 };

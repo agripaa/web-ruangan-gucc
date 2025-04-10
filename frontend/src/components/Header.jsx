@@ -84,7 +84,6 @@ const Header = ({ id }) => {
       setNotifications(logs || []);
       setUnreadNotifications(logs.length > 0);
     } catch (error) {
-      console.log(error)
       return error;
     }
   };

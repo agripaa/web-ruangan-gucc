@@ -23,7 +23,6 @@ const LoginUser = () => {
             router.push("/");
           }
         } catch (error) { 
-          console.log("Unauthorized - No Token Provided")
         }
       }
     };

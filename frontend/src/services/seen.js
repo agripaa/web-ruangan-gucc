@@ -12,7 +12,6 @@ try {
   });
   return response.data.unread_count; // Mengembalikan jumlah notifikasi yang belum dibaca
 } catch (error) {
-  console.error("Error fetching unread notifications count:", error);
   if([400, 401, 402, 403].includes(error.status)){
     window.location.href = '/login-admin'
   }
@@ -30,7 +29,6 @@ export const checkNewNotifications = async () => {
     });
     return response.data.has_new; // Mengembalikan true atau false
   } catch (error) {
-    console.error("Error checking new notifications:", error);
     return false;
   }
 };
@@ -47,7 +45,6 @@ export const markNotificationsAsRead = async () => {
     });
     return response.data.message; // Mengembalikan pesan setelah berhasil
   } catch (error) {
-    console.error("Error marking notifications as read:", error);
     throw error.response?.data || "Failed to mark notifications as read";
   }
 };

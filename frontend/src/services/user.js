@@ -59,3 +59,12 @@ export const deleteAccount = async () => {
         throw error || "Failed to delete account";
     }
 };
+
+export const logout = async () => {
+    try {
+        localStorage.removeItem("token");
+        window.location.href = '/login'
+    } catch (error) {
+        throw error || "Failed to delete account";
+    }
+};

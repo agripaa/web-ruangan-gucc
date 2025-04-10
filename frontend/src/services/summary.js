@@ -24,7 +24,6 @@ export const saveReportSummary = async (reportId, summary) => {
     });
       return response.data;
     } catch (error) {
-      console.error(error);
       throw error.response?.data || "Failed to get data summary";
     }
 };

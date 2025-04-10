@@ -33,7 +33,6 @@ const Dashboard = () => {
         setActivityLog(logs);
       }
     } catch (error) {
-      console.log(error)
       if([400, 401, 402, 403].includes(error.status)){
         router.push('/login')
       }

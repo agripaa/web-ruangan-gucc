@@ -153,18 +153,18 @@ func Login(c *fiber.Ctx) error {
 func LoginUser(c *fiber.Ctx) error {
 	var request AuthRequest
 	if err := c.BodyParser(&request); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid Request"})
 	}
 
 	var user models.User
 	result := config.DB.Where("username = ?", request.Username).First(&user)
 	if result.Error != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(401).JSON(fiber.Map{"error": "User Not Found!"})
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(401).JSON(fiber.Map{"error": "Invalid Password!"})
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
