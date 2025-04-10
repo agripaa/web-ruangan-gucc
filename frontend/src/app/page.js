@@ -24,7 +24,8 @@ export default function Home() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
+  
+  const token = localStorage.getItem("token");
   const router = useRouter();
 
   const statusMapping = {
@@ -62,6 +63,11 @@ export default function Home() {
 
   useEffect(() => {
 
+    if (!token) {
+      router.push("/login");
+      return; 
+    }
+  
     fetchCampuses();
     fetchReports();
     // const interval = setInterval(fetchReports, 5000); 

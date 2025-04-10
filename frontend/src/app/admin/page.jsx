@@ -47,12 +47,12 @@ const Dashboard = () => {
     try {
       const data = await getReportStatusCounts();
       setReportStats(
-        data.map((item, index) => ({
-          name: item.status.toUpperCase(),
-          value: item.count,
-          color: COLORS[index % COLORS.length], // Tambahkan warna berdasarkan indeks
+        data.map((item) => ({
+            name: item.status.toUpperCase(),
+            value: item.count,
+            color: COLOR_MAP[item.status.toUpperCase()] || "#ccc",  // Warna mengikuti urutan status
         }))
-      );
+    );
     } catch (error) {
       if([400, 401, 402, 403].includes(error.status)){
         router.push('/login')
@@ -61,7 +61,13 @@ const Dashboard = () => {
     }
   };
 
-  const COLORS = ["#FFBB28", "#FF8042", "#0088FE", "#00C49F"];
+  const COLOR_MAP = {
+    "PENDING": "#FFBB28",
+    "IN PROGRESS": "#FF8042",
+    "ON THE WAY": "#0088FE",
+    "DONE": "#00C49F"
+};
+
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 min-h-[70vh]">
@@ -101,22 +107,23 @@ const Dashboard = () => {
       <div className="lg:w-1/3 w-full p-4 bg-white rounded-lg shadow-lg flex flex-col items-center">
         <h2 className="text-xl font-bold mb-4">Report Status Overview</h2>
         <PieChart width={280} height={280}>
-          <Pie
-            data={reportStats}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={100}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {reportStats.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
+            <Pie
+              data={reportStats}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+          > 
+              {reportStats.map((entry, index) => (
+                   <Cell key={`cell-${index}`} fill={entry.color} /> 
+              ))}
+            </Pie>
           <Tooltip />
           <Legend verticalAlign="bottom" height={36} />
         </PieChart>
+        
       </div>
     </div>
   );

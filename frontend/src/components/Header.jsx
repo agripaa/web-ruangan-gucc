@@ -135,11 +135,10 @@ const Header = ({ id }) => {
       </div>
 
       <Modal
-        isOpen={isNotifModalOpen}
-        title="Activity Log"
-        onClose={() => setIsNotifModalOpen(false)}
-        submitText="Close"
-        onSubmit={() => setIsNotifModalOpen(false)}
+  isOpen={isNotifModalOpen}
+  title="Activity Log"
+  onClose={() => setIsNotifModalOpen(false)}
+  submitText="Close"
       >
         <div className="max-h-64 overflow-y-auto border rounded-md p-2">
           {notifications.length > 0 ? (

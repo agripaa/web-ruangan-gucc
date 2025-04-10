@@ -13,13 +13,13 @@ type Report struct {
 	PhoneNumber string    `gorm:"type:varchar(25);not null" json:"phone_number"`
 	Room        string    `gorm:"type:varchar(25);not null" json:"room"`
 	CampusID    uint      `gorm:"not null" json:"campus_id"`
-	WorkerID    *uint     `gorm:"default:null" json:"worker_id"` // Foreign key to User
+	WorkerID    *uint     `gorm:"default:null" json:"admin_id"` // Foreign key to User
 	Status      string    `gorm:"type:status_enum;not null;default:'pending'" json:"status"`
 	Description string    `gorm:"type:text" json:"description"`
 	ReportedAt  time.Time `gorm:"type:timestamp" json:"reported_at"`
 	UpdatedAt   time.Time `gorm:"type:timestamp" json:"updated_at"`
 	Campus      Campus    `gorm:"foreignKey:CampusID"`
-	Worker      *User     `gorm:"foreignKey:WorkerID" json:"worker"` // Relasi ke User
+	Worker      User     `gorm:"foreignKey:WorkerID" json:"worker"` // Relasi ke User
 }
 
 func MigrateReports(db *gorm.DB) {

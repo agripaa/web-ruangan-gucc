@@ -286,12 +286,12 @@ const LaporanMasuk = () => {
                   </div>
                 </span>
               </th>
-              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("technician")}>
+              <th className="p-3 text-left cursor-pointer" onClick={() => handleSort("worker_id")}>
                 <span className="inline-flex items-center gap-3">
                   Teknisi
                   <div className="flex flex-col">
-                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
-                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "technician" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortUp className={`w-3 h-3 ${sortConfig.key === "worker_id" && sortConfig.direction === "asc" ? "text-white" : "text-gray-400"}`} />
+                    <FaSortDown className={`w-3 h-3 ${sortConfig.key === "worker_id" && sortConfig.direction === "desc" ? "text-white" : "text-gray-400"}`} />
                   </div>
                 </span>
               </th>
