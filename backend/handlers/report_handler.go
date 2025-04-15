@@ -188,7 +188,9 @@ func SearchReportByToken(c *fiber.Ctx) error {
 	}
 
 	var reports []models.Report
-	config.DB.Preload("Campus").Where("token LIKE ?", "%"+token+"%").Find(&reports)
+	config.DB.Preload("Campus").
+    Where("token = ?", token).
+    Find(&reports)
 
 	if len(reports) == 0 {
 		// Ubah dari status 404 menjadi status 200 dengan array kosong
