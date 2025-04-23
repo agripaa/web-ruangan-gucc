@@ -232,7 +232,7 @@ export default function Home() {
 
                     <div className="form-room">
                       <label>Ruangan *</label>
-                      <input type="text" name="room" value={formData.room} onChange={handleChange} placeholder="Ruangan" required />
+                      <input type="text" name="room" value={formData.room.toUpperCase()} onChange={handleChange} placeholder="Ruangan" required />
                     </div>
                   </div>
 

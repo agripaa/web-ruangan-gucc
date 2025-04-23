@@ -42,7 +42,7 @@ const Laporan = () => {
   const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0"); 
   const currentYear = today.getFullYear().toString();
 
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
   useEffect(() => {
@@ -57,8 +57,8 @@ const Laporan = () => {
         10, 
         sortConfig.key, 
         sortConfig.direction, 
-        selectedMonth, 
-        selectedYear, 
+        selectedMonth || null, 
+        selectedYear || null, 
         searchQuery,
         selectedStatus
       );
@@ -102,11 +102,18 @@ const Laporan = () => {
           <button onClick={() => downloadPDF(selectedMonth, selectedYear)} className="text-white w-24 bg-red-600 hover:bg-red-800 mx-2 py-2 px-4 font-semibold rounded-xl">Pdf</button>
           
           <div className="flex items-center bg-[#F9F9F9] px-3 py-2 rounded-lg border-none">
-            <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="bg-transparent text-gray-700 outline-none cursor-pointer">
-              {months.map((month) => (
-                <option key={month.value} value={month.value}>{month.label}</option>
-              ))}
-            </select>
+          <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent text-gray-700 outline-none cursor-pointer"
+              >
+                <option value="">Semua Bulan</option>
+                {months.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
             <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="bg-transparent text-gray-700 outline-none cursor-pointer ml-2">
               {years.map((year) => (
                 <option key={year} value={year}>{year}</option>
@@ -131,7 +138,7 @@ const Laporan = () => {
               placeholder="Search..."
               className="border px-4 py-2 rounded-lg"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
             />
           </div>
       </div>

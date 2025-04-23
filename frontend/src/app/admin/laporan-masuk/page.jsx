@@ -262,7 +262,7 @@ const LaporanMasuk = () => {
               placeholder="Search..."
               className="border px-4 py-2 rounded-lg"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
             />
           </div>
         </div>
