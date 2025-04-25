@@ -15,7 +15,7 @@ const page = () => {
         localStorage.setItem("token", data.token);
         router.push('/admin');
       } catch (err) {
-        setError(err.error || "Login gagal, periksa kembali username dan password.");
+        console.log(err)
       }
     }
 
