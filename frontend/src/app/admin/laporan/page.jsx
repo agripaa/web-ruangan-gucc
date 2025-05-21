@@ -42,7 +42,7 @@ const Laporan = () => {
   const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0"); 
   const currentYear = today.getFullYear().toString();
 
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
   useEffect(() => {
@@ -107,7 +107,6 @@ const Laporan = () => {
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="bg-transparent text-gray-700 outline-none cursor-pointer"
               >
-                <option value="">Semua Bulan</option>
                 {months.map((month) => (
                   <option key={month.value} value={month.value}>
                     {month.label}
