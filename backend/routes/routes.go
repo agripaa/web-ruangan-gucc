@@ -79,6 +79,7 @@ func SetupRoutes(app *fiber.App) {
 
 	inventory := admin.Group("/inventory")
 	inventory.Get("/", handlers.GetInventories)
+	inventory.Get("/paginate", handlers.GetInventoryPaginated)
 	inventory.Get("/:id", handlers.GetInventoryByID)
 	inventory.Post("/", handlers.CreateInventory)
 	inventory.Put("/:id", handlers.UpdateInventory)
@@ -86,6 +87,9 @@ func SetupRoutes(app *fiber.App) {
 
 	usages := admin.Group("/usage")
 	usages.Get("/", handlers.GetUsages)
+	usages.Get("/paginate", handlers.GetUsagePaginated)
+	usages.Get("/export/pdf", handlers.ExportUsageToPDF)
+	usages.Get("/export/excel", handlers.ExportUsageToExcel)
 	usages.Get("/:id", handlers.GetUsageByID)
 	usages.Post("/", handlers.CreateUsage)
 	usages.Put("/:id", handlers.UpdateUsage)

@@ -3,6 +3,8 @@ package handlers
 import (
 	"backend/config"
 	"backend/models"
+	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -14,6 +16,50 @@ func GetInventories(c *fiber.Ctx) error {
 	var inventories []models.Inventory
 	config.DB.Preload("Usages").Find(&inventories)
 	return c.JSON(inventories)
+}
+
+func GetInventoryPaginated(c *fiber.Ctx) error {
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	search := c.Query("search", "")
+	sort := c.Query("sort", "id")
+	order := c.Query("order", "asc")
+	statusFilter := c.Query("status", "")
+
+	if page < 1 {
+		page = 1
+	}
+	offset := (page - 1) * limit
+
+	var inventories []models.Inventory
+	var total int64
+
+	query := config.DB.Model(&models.Inventory{}).Preload("Usages")
+
+	if search != "" {
+		query = query.Where("name ILIKE ?", "%"+search+"%")
+	}
+
+	if statusFilter != "" {
+		query = query.Where("status = ?", statusFilter)
+	}
+
+	query.Count(&total)
+
+	if order != "asc" && order != "desc" {
+		order = "asc"
+	}
+	query = query.Order(fmt.Sprintf("%s %s", sort, order))
+
+	query.Offset(offset).Limit(limit).Find(&inventories)
+
+	return c.JSON(fiber.Map{
+		"data":        inventories,
+		"total":       total,
+		"page":        page,
+		"limit":       limit,
+		"total_pages": (total + int64(limit) - 1) / int64(limit),
+	})
 }
 
 func GetInventoryByID(c *fiber.Ctx) error {
