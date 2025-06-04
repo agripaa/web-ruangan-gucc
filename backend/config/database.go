@@ -34,7 +34,7 @@ func ConnectDB() {
 		user = "postgres"
 	}
 	if password == "" {
-		password = "aping123"
+		password = "postgres"
 	}
 	if dbname == "" {
 		dbname = "gucc"
