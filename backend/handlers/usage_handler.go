@@ -155,6 +155,8 @@ func ExportUsageToPDF(c *fiber.Ctx) error {
 		pdf.Ln(5)
 		pdf.Cell(40, 10, fmt.Sprintf("Jumlah Digunakan: %s", usage.Amount))
 		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Kampus dan Ruangan: %s", usage.Room))
+		pdf.Ln(5)
 		pdf.Cell(40, 10, fmt.Sprintf("Tanggal Pemasangan: %s", usage.InstallationDate.Format("2006-01-02")))
 		pdf.Ln(10)
 	}
@@ -197,7 +199,7 @@ func ExportUsageToExcel(c *fiber.Ctx) error {
 	xlsx.SetCellValue(sheet, "A2", fmt.Sprintf("Periode: %s-%02d", year, monthInt))
 	xlsx.MergeCell(sheet, "A2", "C2")
 
-	headers := []string{"Nama Inventaris", "Jumlah Digunakan", "Tanggal Pemasangan"}
+	headers := []string{"Nama Inventaris", "Jumlah Digunakan", "Kampus dan Ruangan", "Tanggal Pemasangan"}
 	for col, header := range headers {
 		colLetter, _ := excelize.ColumnNumberToName(col + 1)
 		xlsx.SetCellValue(sheet, fmt.Sprintf("%s3", colLetter), header)
@@ -207,6 +209,7 @@ func ExportUsageToExcel(c *fiber.Ctx) error {
 		row := i + 4
 		xlsx.SetCellValue(sheet, fmt.Sprintf("A%d", row), usage.Inventory.Name)
 		xlsx.SetCellValue(sheet, fmt.Sprintf("B%d", row), usage.Amount)
+		xlsx.SetCellValue(sheet, fmt.Sprintf("B%d", row), usage.Room)
 		xlsx.SetCellValue(sheet, fmt.Sprintf("C%d", row), usage.InstallationDate.Format("2006-01-02"))
 	}
 

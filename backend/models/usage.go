@@ -8,8 +8,8 @@ import (
 
 type Usage struct {
 	ID               uint      `gorm:"primaryKey"`
-	InventoryID      uint      `gorm:"not null"`
-	CampusID         uint      `gorm:"not null"`
+	InventoryID      uint      `gorm:"not null" json:"inventory_id"`
+	CampusID         uint      `gorm:"not null" json:"campus_id"`
 	Room             string    `gorm:"type:varchar(255);not null"`
 	Amount           string    `gorm:"type:varchar(255);not null"`
 	InstallationDate time.Time `gorm:"type:timestamp;not null"`

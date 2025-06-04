@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import LogoGUCC from '../assets/Logo GUCC.png';
-import { FaHome, FaClock, FaFolder, FaUser } from "react-icons/fa";
+import { FaHome, FaClock, FaFolder, FaUser, FaArchive } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6"; 
 
 const Sidebar = () => {
@@ -22,6 +22,7 @@ const Sidebar = () => {
     { name: "Incoming Reports", href: "/admin/laporan-masuk", icon: <FaClock /> },
     { name: "Reports", href: "/admin/laporan", icon: <FaFolder /> },
     { name: "Campus", href: "/admin/campus", icon: <FaBuildingUser /> },
+    { name: "Usage", href: "/admin/usage", icon: <FaArchive /> },
     { name: "Profile", href: "/admin/profile", icon: <FaUser /> }
   ];
 
