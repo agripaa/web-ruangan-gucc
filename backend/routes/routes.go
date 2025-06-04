@@ -11,6 +11,7 @@ func SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	api.Post("/register", handlers.Register)
+	api.Post("/register/admin", handlers.RegisterAdmin)
 	api.Post("/login", handlers.Login)
 	api.Post("/login/user", handlers.LoginUser)
 
@@ -75,6 +76,18 @@ func SetupRoutes(app *fiber.App) {
 	notif.Get("/unread/", handlers.GetUnreadNotifications)
 	notif.Post("/mark-read/", handlers.MarkNotificationAsRead)
 	notif.Get("/has-new/", handlers.CheckNewNotifications)
+
+	inventory := admin.Group("/inventory")
+	inventory.Get("/", handlers.GetInventories)
+	inventory.Get("/:id", handlers.GetInventoryByID)
+	inventory.Post("/", handlers.CreateInventory)
+	inventory.Put("/:id", handlers.UpdateInventory)
+	inventory.Delete("/inventories/:id", handlers.DeleteInventory)
+
+	usages := admin.Group("/usage")
+	usages.Get("/", handlers.GetUsages)
+	usages.Get("/:id", handlers.GetUsageByID)
+	usages.Post("/", handlers.CreateUsage)
+	usages.Put("/:id", handlers.UpdateUsage)
+	usages.Delete("/:id", handlers.DeleteUsage)
 }
-
-

@@ -66,6 +66,32 @@ func Register(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "User registered successfully"})
 }
 
+func RegisterAdmin(c *fiber.Ctx) error {
+	var request RegisterRequest
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to hash password"})
+	}
+
+	user := models.User{
+		Username:    request.Username,
+		Password:    string(hashedPassword),
+		PhoneNumber: request.PhoneNumber,
+		Role:        "admin",
+	}
+
+	result := config.DB.Create(&user)
+	if result.Error != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create user"})
+	}
+
+	return c.JSON(fiber.Map{"message": "User registered successfully"})
+}
+
 func Login(c *fiber.Ctx) error {
 	var request LoginRequest
 	if err := c.BodyParser(&request); err != nil {

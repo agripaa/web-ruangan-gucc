@@ -189,8 +189,8 @@ func SearchReportByToken(c *fiber.Ctx) error {
 
 	var reports []models.Report
 	config.DB.Preload("Campus").
-    Where("token = ?", token).
-    Find(&reports)
+		Where("token = ?", token).
+		Find(&reports)
 
 	if len(reports) == 0 {
 		// Ubah dari status 404 menjadi status 200 dengan array kosong
@@ -205,7 +205,6 @@ func SearchReportByToken(c *fiber.Ctx) error {
 		"data":    reports,
 	})
 }
-
 
 func GetReportPagination(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
