@@ -80,6 +80,8 @@ func ExportReportsToPDF(c *fiber.Ctx) error {
 		pdf.Ln(5)
 		pdf.Cell(40, 10, fmt.Sprintf("Room: %s", report.Room))
 		pdf.Ln(5)
+		pdf.Cell(40, 10, fmt.Sprintf("Deskripsi Laporan: %s", report.Description))
+		pdf.Ln(5)
 		pdf.Cell(40, 10, fmt.Sprintf("Campus: %s, %s", report.Campus.CampusName, report.Campus.CampusLocation))
 		pdf.Ln(5)
 		pdf.Cell(40, 10, fmt.Sprintf("Status: %s", report.Status))
