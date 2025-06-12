@@ -78,22 +78,6 @@ func CreateActivityLog(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch users", "details": err.Error()})
 	}
 
-	var activitySeenEntries []models.ActivitySeen
-	for _, user := range users {
-		activitySeenEntries = append(activitySeenEntries, models.ActivitySeen{
-			UserID:     user.ID,   // Setiap user mendapatkan entry
-			ActivityID: log.ID,    // ID dari activity_log yang baru dibuat
-			IsRead:     false,     // Default belum dibaca
-			CreatedAt:  time.Now().UTC(),
-		})
-	}
-
-
-	// Simpan entri ActivitySeen
-	if err := config.DB.Create(&activitySeenEntries).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create activity seen entries", "details": err.Error()})
-	}
-
 	return c.Status(201).JSON(log)
 }
 

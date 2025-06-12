@@ -48,3 +48,29 @@ export const markNotificationsAsRead = async () => {
     throw error.response?.data || "Failed to mark notifications as read";
   }
 };
+
+export const getUnreadActivityLogs = async () => {
+  try {
+    const response = await api.post(`/admin/notification/`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.message; // Mengembalikan pesan setelah berhasil
+  } catch (error) {
+    throw error.response?.data || "Failed to mark notifications as read";
+  }
+};
+
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const response = await api.post(`/admin/notification/read`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // Mengembalikan pesan setelah berhasil
+  } catch (error) {
+    throw error.response?.data || "Failed to mark notifications as read";
+  }
+};
