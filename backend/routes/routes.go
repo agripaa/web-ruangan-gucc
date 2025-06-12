@@ -73,9 +73,12 @@ func SetupRoutes(app *fiber.App) {
 	adminUsers.Delete("/:id", handlers.DeleteAdmin)
 
 	notif := admin.Group("/notification")
+	notif.Get("/", handlers.GetUnreadActivityLogs)
+	notif.Post("/read", handlers.MarkAllNotificationsAsRead)
 	notif.Get("/unread/", handlers.GetUnreadNotifications)
 	notif.Post("/mark-read/", handlers.MarkNotificationAsRead)
 	notif.Get("/has-new/", handlers.CheckNewNotifications)
+	notif.Post("/create-seen/", handlers.CreateActivitySeen)
 
 	inventory := admin.Group("/inventory")
 	inventory.Get("/", handlers.GetInventories)

@@ -19,23 +19,15 @@ func getLastDayOfMonth(year int, month int) int {
 	return time.Date(year, time.Month(month+1), 0, 0, 0, 0, 0, time.UTC).Day()
 }
 
-func generateUniqueToken(length int) string {
+func generateUniqueToken() string {
 	rand.Seed(time.Now().UnixNano())
-	var token string
-	for {
-		tokenBytes := make([]byte, length)
-		for i := range tokenBytes {
-			tokenBytes[i] = charset[rand.Intn(len(charset))]
-		}
-		token = string(tokenBytes)
-
-		var count int64
-		config.DB.Model(&models.Report{}).Where("token = ?", token).Count(&count)
-		if count == 0 {
-			break
-		}
+	randomPart := make([]byte, 4)
+	for i := range randomPart {
+		randomPart[i] = charset[rand.Intn(len(charset))]
 	}
-	return token
+
+	datePart := time.Now().Format("02012006")
+	return datePart + string(randomPart)
 }
 
 func ExportReportsToPDF(c *fiber.Ctx) error {
@@ -280,7 +272,7 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	report.Token = generateUniqueToken(20)
+	report.Token = generateUniqueToken()
 	report.Status = "pending"
 	report.ReportedAt = time.Now()
 	report.UpdatedAt = time.Now()
