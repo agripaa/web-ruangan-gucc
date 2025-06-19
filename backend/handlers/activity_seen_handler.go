@@ -21,17 +21,20 @@ func GetUnreadNotifications(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch seen activity ids"})
 	}
 
-	// Ambil semua activity log yang belum terlihat (unread) oleh user
+	// Ambil hanya activity log yang ditujukan ke user ini dan belum dilihat
 	var unreadLogs []models.ActivityLog
-	query := config.DB.Preload("User").Preload("Report").Model(&models.ActivityLog{})
+	query := config.DB.Preload("User").Preload("Report").
+		Model(&models.ActivityLog{}).
+		Where("target_user_id = ?", userID) // Pastikan log ini memang untuk user ini
+
 	if len(seenActivityIDs) > 0 {
 		query = query.Where("id NOT IN ?", seenActivityIDs)
 	}
+
 	if err := query.Order("timestamp DESC").Find(&unreadLogs).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch unread logs"})
 	}
 
-	// Hitung jumlah
 	unreadCount := len(unreadLogs)
 
 	return c.JSON(fiber.Map{

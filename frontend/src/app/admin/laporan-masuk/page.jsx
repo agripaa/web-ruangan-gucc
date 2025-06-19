@@ -7,6 +7,7 @@ import { createActivityLog } from "../../../services/logs";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
+import { getUnreadNotificationsCount } from "../../../services/seen";
 
 const months = [
   { label: "Januari", value: "01" },
@@ -168,6 +169,9 @@ const LaporanMasuk = () => {
         target_report_id: report.ID,
         user_id: report.worker ? report.worker.ID : null,
       });
+      // Setelah update berhasil
+      window.dispatchEvent(new Event("notification-update"));
+
 
 
       Swal.fire("Success", `Status updated to '${nextStatus}'`, "success");
@@ -192,6 +196,7 @@ const LaporanMasuk = () => {
       if (selectedReport?.status === "in progress") {
         await handleStatusUpdate(selectedReport, "done"); // +
       }
+      window.dispatchEvent(new Event("notification-update"));
 
       await fetchReports();
       closeSummaryModal();
