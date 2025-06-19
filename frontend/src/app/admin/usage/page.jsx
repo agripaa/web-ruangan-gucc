@@ -93,11 +93,15 @@ const Usage = () => {
 const fetchInventories = async () => {
   try {
     const data = await getAllInventories();
-    setInventoryList(data);
+
+    const filtered = data.filter((item) => item.Amount > 0);
+
+    setInventoryList(filtered);
   } catch (error) {
     Swal.fire("Gagal", "Gagal mengambil daftar inventory", "error");
   }
 };
+
 
 const fetchCampuses = async () => {
   try {
