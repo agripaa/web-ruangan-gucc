@@ -31,6 +31,7 @@ func main() {
 
 	seeders.SeedUsers(config.DB)
 	seeders.SeedCampuses(config.DB)
+	seeders.SeedAdmin(config.DB)
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",

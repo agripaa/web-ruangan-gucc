@@ -13,6 +13,7 @@ import { getCampuses } from "../services/campus";
 import { getAllReport, createReport, getReportByToken } from "../services/reports";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { RiInformationLine, RiPhoneLine, RiWhatsappLine, RiMailLine } from 'react-icons/ri';
 
 export default function Home() {
   const [reports, setReports] = useState([]);
@@ -27,6 +28,8 @@ export default function Home() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
   
   const token = localStorage.getItem("token");
   const router = useRouter();
@@ -344,6 +347,38 @@ export default function Home() {
             </button>
           </div>
         </div>
+        <button 
+          className="info-button"
+          onClick={() => setShowInfoModal(true)}
+          aria-label="Information"
+        >
+          <RiInformationLine size={24} />
+        </button>
+
+        {/* Info Modal */}
+        {showInfoModal && (
+          <div className="overlay" onClick={() => setShowInfoModal(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-title">
+                <h1>Kontak Bantuan</h1>
+              </div>
+              <div className="modal-content">
+                <ul className="info-list">
+                  <li>
+                    <RiPhoneLine size={25} /> <span>Telepon: (021) 1234 5678</span>
+                  </li>
+                  <li>
+                    <RiWhatsappLine size={25} /> <span>WhatsApp: +62 812 3456 7890</span>
+                  </li>
+                  <li>
+                    <RiMailLine size={25} /> <span>Email: bantuan@gunadarma.ac.id</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );
