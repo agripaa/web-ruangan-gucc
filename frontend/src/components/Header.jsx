@@ -10,6 +10,7 @@ import api from "../services/api";
 import { FaBell } from "react-icons/fa";
 import Image from "next/image";
 import LogoGunadarma from "../assets/Universitas Gunadarma.png";
+import { RiArrowLeftLine } from "react-icons/ri";
 import Modal from "../components/Modal";
 import { useRouter } from "next/navigation";
 
@@ -34,6 +35,18 @@ const Header = () => {
     };
 
     init();
+
+    // 🟡 Listen for custom event to refresh notification count
+    const handleNotificationUpdate = async () => {
+      await fetchUnreadCount();
+    };
+
+    window.addEventListener("notification-update", handleNotificationUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("notification-update", handleNotificationUpdate);
+    };
   }, []);
 
   const fetchUnreadCount = async () => {
@@ -81,8 +94,15 @@ const Header = () => {
 
   return (
     <header className="w-full flex justify-between items-center p-5 px-7 bg-white">
-      <div className="w-full">
-        <div className="flex items-center w-full justify-between py-8">
+      <div className="w-full relative">
+        <div className="absolute top-4">
+          <button onClick={() => router.back()} className="flex items-center justify-center gap-2 text-blue-500 hover:text-blue-600">
+            <RiArrowLeftLine size={20} />
+            Kembali
+          </button>
+        </div>
+        <div className="flex items-center mt-6 w-full justify-between py-8">
+
           <div className="flex items-center">
             <Image src={LogoGunadarma} alt="logo gunadarma" width={35} />
             <h1 className="text-md font-medium ml-2">UG Network Assistance</h1>

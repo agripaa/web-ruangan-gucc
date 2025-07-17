@@ -200,14 +200,6 @@ const fetchCampuses = async () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                router.push("/admin/inventory");
-              }}
-              className="bg-green-500 text-white text-md px-3 py-2 rounded-md"
-            >
-              List Stock
-            </button>
-            <button
-              onClick={() => {
                 setIsAddInstallModalOpen(true);
               }}
               className="bg-yellow-500 text-white text-md px-3 py-2 rounded-md"
