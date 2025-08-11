@@ -19,13 +19,13 @@ const Sidebar = () => {
   
 
   const navItems = [
-    { name: "Home", href: "/admin", icon: <FaHome /> },
-    { name: "Incoming Reports", href: "/admin/laporan-masuk", icon: <FaClock /> },
-    { name: "Reports", href: "/admin/laporan", icon: <FaFolder /> },
-    { name: "Campus", href: "/admin/campus", icon: <FaBuildingUser /> },
-    { name: "Usage", href: "/admin/inventory", icon: <FaArchive /> },
-    { name: "Usage", href: "/admin/usage", icon: <GiAutoRepair /> },
-    { name: "Profile", href: "/admin/profile", icon: <FaUser /> }
+    { name: "Home", href: "/admin/", icon: <FaHome /> },
+    { name: "Incoming Reports", href: "/admin/laporan-masuk/", icon: <FaClock /> },
+    { name: "Reports", href: "/admin/laporan/", icon: <FaFolder /> },
+    { name: "Campus", href: "/admin/campus/", icon: <FaBuildingUser /> },
+    { name: "Usage", href: "/admin/inventory/", icon: <FaArchive /> },
+    { name: "Usage", href: "/admin/usage/", icon: <GiAutoRepair /> },
+    { name: "Profile", href: "/admin/profile/", icon: <FaUser /> }
   ];
 
   return (
@@ -43,7 +43,6 @@ const Sidebar = () => {
             <ul className="flex flex-col w-16 space-y-6">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
-
                 return (
                   <li key={item.href}>
                     <div
