@@ -1,33 +1,44 @@
-"use client"
+"use client";
 import { login } from '../../../services/auth';
-import { useRouter, useSearchParams } from 'next/navigation'
-import React from 'react'
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-const page = () => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const token = searchParams.get('token');
+const Page = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
 
-    const handleVerify = async() => {
-      try {
-        const data = await login(token);
-        localStorage.setItem("token", data.token);
-        router.push('/admin');
-      } catch (err) {
-        setError(err.error || "Login gagal, periksa kembali username dan password.");
-      }
+  const [dots, setDots] = useState("");
+
+  const handleVerify = async () => {
+    try {
+      const data = await login(token);
+      localStorage.setItem("token", data.token);
+      router.push('/admin');
+    } catch (err) {
+      console.error("Verifikasi gagal:", err);
+      router.push('/login-admin-manual');
     }
+  };
 
-    useEffect(()=> {
-      handleVerify();
-    }, [])
-    
+  useEffect(() => {
+    if (token) handleVerify();
+    else router.push('/login-admin-manual');
+  }, [token]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+    }, 500); // kecepatan ketik
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-        Verifying...
+    <div className="flex items-center justify-center h-screen bg-gray-100 text-xl font-semibold">
+      Verifying{dots}
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;

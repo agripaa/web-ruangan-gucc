@@ -3,6 +3,15 @@ import api from "./api";
 const token = localStorage.getItem("token");
 
 export const getCampuses = async () => {
+    
+    const token = localStorage.getItem("token"); // atau dari tempat kamu menyimpan token
+
+    if (!token) {
+        
+        window.location.href = "/login";
+        return; 
+    }
+
     try {
       const response = await api.get("/client/campuses", {
         headers: { Authorization: `Bearer ${token}` } 

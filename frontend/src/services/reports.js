@@ -12,6 +12,13 @@ export const getAllReport = async (
     search = "",
     status = ""
 ) => {
+    const token = localStorage.getItem("token"); // atau dari tempat kamu menyimpan token
+
+    if (!token) {
+        
+        window.location.href = "/login";
+        return; 
+    }
     try {
         const response = await api.get("/client/reports/paginating",{
             params: { page, limit, sort, order, month, year, search, status },
