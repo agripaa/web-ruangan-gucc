@@ -1,5 +1,8 @@
 // api.js — fetch wrapper ala axios (cookieless by default)
-const BASE_URL = process.env.NEXT_PUBLIC_API_DEV_BASE_URL_V1;
+
+// 1) pastikan baseURL punya trailing slash
+const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_DEV_BASE_URL_V1 || "";
+const BASE_URL = RAW_BASE_URL.endsWith("/") ? RAW_BASE_URL : RAW_BASE_URL + "/";
 
 // default header untuk JSON; otomatis dilepas kalau kirim FormData
 const DEFAULT_HEADERS = { "Content-Type": "application/json" };
@@ -12,9 +15,17 @@ const timeoutFetch = (url, options = {}, timeout = 10000) => {
   return fetch(url, opts).finally(() => clearTimeout(id));
 };
 
-// rakit URL + query params (kalau config.params dipakai)
+// Gabung base + path tanpa “menghapus” path base
 const buildURL = (base, path = "", params) => {
-  const u = new URL(path, base);
+  // kalau path sudah absolute (http/https), jangan gabung dengan base
+  const isAbsolute = /^https?:\/\//i.test(path);
+  const baseWithSlash = base.endsWith("/") ? base : base + "/";
+  const relativePath = String(path).replace(/^\/+/, ""); // strip leading '/'
+
+  const u = isAbsolute
+    ? new URL(path)
+    : new URL(relativePath, baseWithSlash);
+
   if (params && typeof params === "object") {
     for (const [k, v] of Object.entries(params)) {
       if (v !== undefined && v !== null) u.searchParams.append(k, String(v));
@@ -51,28 +62,21 @@ const request = async (
     typeof FormData !== "undefined" && data instanceof FormData;
 
   const finalHeaders = new Headers({ ...DEFAULT_HEADERS, ...headers });
-  if (isFormData) {
-    // biarkan browser set boundary
-    finalHeaders.delete("Content-Type");
-  }
+  if (isFormData) finalHeaders.delete("Content-Type"); // biar boundary otomatis
 
   const options = {
     method,
     headers: finalHeaders,
-    credentials,      // <-- 'omit' supaya cookie tidak terkirim
+    credentials,   // <-- 'omit' supaya cookie tidak terkirim
     cache: "no-store",
     ...rest,
   };
-
-  if (data !== undefined) {
-    options.body = isFormData ? data : JSON.stringify(data);
-  }
+  if (data !== undefined) options.body = isFormData ? data : JSON.stringify(data);
 
   let res;
   try {
     res = await timeoutFetch(fullURL, options, timeout);
   } catch (err) {
-    // konsisten dengan axios: lempar error "network"
     throw {
       message: err?.message || "Network Error",
       isAxiosLikeError: true,
@@ -90,11 +94,7 @@ const request = async (
     url: fullURL,
   };
 
-  if (!res.ok) {
-    // konsisten dengan axios: error.response.data bisa dipakai
-    throw { message: "Request failed", isAxiosLikeError: true, response };
-  }
-
+  if (!res.ok) throw { message: "Request failed", isAxiosLikeError: true, response };
   return response;
 };
 
