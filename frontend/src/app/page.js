@@ -365,13 +365,13 @@ export default function Home() {
               <div className="modal-content">
                 <ul className="info-list">
                   <li>
-                    <RiPhoneLine size={25} /> <span>Telepon: (021) 1234 5678</span>
+                    <RiPhoneLine size={25} /> <span>Telepon: +622178881112</span>
                   </li>
                   <li>
-                    <RiWhatsappLine size={25} /> <span>WhatsApp: +62 812 3456 7890</span>
+                    <RiWhatsappLine size={25} /> <span>WhatsApp: +62 851-7413-3784</span>
                   </li>
                   <li>
-                    <RiMailLine size={25} /> <span>Email: bantuan@gunadarma.ac.id</span>
+                    <RiMailLine size={25} /> <span>Email: gucc@gunadarma.ac.id</span>
                   </li>
                 </ul>
               </div>
