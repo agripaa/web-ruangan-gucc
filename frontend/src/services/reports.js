@@ -1,6 +1,7 @@
 import api from "./api";
 
-const token = localStorage.getItem("token");
+// Always read the latest token from storage to avoid using a stale value
+const getToken = () => localStorage.getItem("token");
 
 export const getAllReport = async (
     page = 1,
@@ -53,6 +54,7 @@ export const getReports = async (
     search = "",
     status = ""
 ) => {
+    const token = getToken();
     try {
         const response = await api.get("/admin/reports/paginate/datum", {
             params: { page, limit, sort, order, month, year, search, status },
@@ -65,6 +67,7 @@ export const getReports = async (
 };
 
 export const createReport = async (reportData) => {
+    const token = getToken();
     try {
       const response = await api.post("/client/reports", reportData, {
         headers: { Authorization: `Bearer ${token}` } 
@@ -73,9 +76,10 @@ export const createReport = async (reportData) => {
     } catch (error) {
       throw error.response?.data || "Failed to create report";
     }
-  };
+};
 
 export const updateReportStatus = async (reportId, status) => {
+    const token = getToken();
     try {
         const response = await api.put(
             `/admin/reports/${reportId}/status`,
@@ -89,6 +93,7 @@ export const updateReportStatus = async (reportId, status) => {
 };
 
 export const downloadExcel = async (month = "", year = "") => {
+    const token = getToken();
     try {
         const response = await api.get("/admin/reports/export/excel", {
             params: { month, year },
@@ -109,6 +114,7 @@ export const downloadExcel = async (month = "", year = "") => {
 };
 
 export const downloadPDF = async (month = "", year = "") => {
+    const token = getToken();
     try {
         const response = await api.get("/admin/reports/export/pdf", {
             params: { month, year },
@@ -129,6 +135,7 @@ export const downloadPDF = async (month = "", year = "") => {
 };
 
 export const getReportStatusCounts = async () => {
+  const token = getToken();
   try {
     const response = await api.get("/admin/reports/status/count", {
         headers:{
