@@ -42,6 +42,19 @@ const parseBody = async (res) => {
   try { return await res.text(); } catch { return null; }
 };
 
+const resolveCredentials = (targetURL, requestedCredentials) => {
+  if (requestedCredentials) return requestedCredentials;
+  if (typeof window === "undefined") return "omit";
+
+  try {
+    return new URL(targetURL).origin === window.location.origin
+      ? "same-origin"
+      : "omit";
+  } catch {
+    return "omit";
+  }
+};
+
 const request = async (
   method,
   url,
@@ -51,8 +64,8 @@ const request = async (
     headers = {},
     params,
     data,
-    // penting: cookieless
-    credentials = "omit",
+    // request same-origin boleh bawa cookie (mis. cf_clearance); cross-origin tetap cookieless
+    credentials,
     ...rest
   } = {}
 ) => {
@@ -67,7 +80,7 @@ const request = async (
   const options = {
     method,
     headers: finalHeaders,
-    credentials,   // <-- 'omit' supaya cookie tidak terkirim
+    credentials: resolveCredentials(fullURL, credentials),
     cache: "no-store",
     ...rest,
   };
